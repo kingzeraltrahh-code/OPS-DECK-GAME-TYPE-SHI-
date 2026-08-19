@@ -1,765 +1,1901 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OPS DECK — Scenario &amp; Map Generator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0e1013;
-    --bg-panel:#171a1f;
-    --bg-panel-alt:#1d2127;
-    --bg-inset:#0e1013;
-    --border:#2a2f37;
-    --border-soft:#22262d;
-    --text:#e8e6df;
-    --text-dim:#8b909a;
-    --text-faint:#565b64;
-    --amber:#c9963c;
-    --amber-dim:#7a6132;
-    --teal:#4fa8a0;
-    --teal-dim:#2f5f5a;
-    --red:#b1453f;
-    --red-dim:#5c2a27;
-    --green:#6f9e58;
-    --font-display:'Big Shoulders Display', sans-serif;
-    --font-body:'Inter', sans-serif;
-    --font-mono:'IBM Plex Mono', monospace;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:
-      radial-gradient(ellipse at 20% -10%, rgba(79,168,160,0.06), transparent 45%),
-      radial-gradient(ellipse at 100% 0%, rgba(201,150,60,0.05), transparent 40%),
-      var(--bg);
-    color:var(--text);
-    font-family:var(--font-body);
-    min-height:100vh;
-    -webkit-font-smoothing:antialiased;
-  }
-  ::selection{background:var(--amber);color:#141414;}
-  a{color:var(--teal);}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPS DECK — Scenario &amp; Map Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --bg: #0e1013;
+            --bg-panel: #171a1f;
+            --bg-panel-alt: #1d2127;
+            --bg-inset: #0e1013;
+            --border: #2a2f37;
+            --border-soft: #22262d;
+            --text: #e8e6df;
+            --text-dim: #8b909a;
+            --text-faint: #565b64;
+            --amber: #c9963c;
+            --amber-dim: #7a6132;
+            --teal: #4fa8a0;
+            --teal-dim: #2f5f5a;
+            --red: #b1453f;
+            --red-dim: #5c2a27;
+            --green: #6f9e58;
+            --font-display: 'Big Shoulders Display', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: radial-gradient(ellipse at 20% -10%, rgba(79, 168, 160, 0.06), transparent 45%), radial-gradient(ellipse at 100% 0%, rgba(201, 150, 60, 0.05), transparent 40%), var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+         ::selection {
+            background: var(--amber);
+            color: #141414;
+        }
+        
+        a {
+            color: var(--teal);
+        }
+        /* ---------- layout shell ---------- */
+        
+        .shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 20px 60px;
+        }
+        
+        header.topbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        
+        .brand .mark {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: .18em;
+            color: var(--text-faint);
+            border: 1px solid var(--border);
+            padding: 3px 7px;
+            border-radius: 3px;
+        }
+        
+        .brand h1 {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 30px;
+            letter-spacing: .03em;
+            margin: 0;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+        
+        .brand h1 span {
+            color: var(--amber);
+        }
+        
+        .topbar-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .seed-tag {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-dim);
+            background: var(--bg-panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .seed-tag b {
+            color: var(--amber);
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+        
+        .toggle-group {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .toggle-group button {
+            background: var(--bg-panel-alt);
+            color: var(--text-dim);
+            border: none;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: .06em;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: .15s;
+        }
+        
+        .toggle-group button.active {
+            background: var(--amber);
+            color: #161311;
+            font-weight: 600;
+        }
+        
+        .toggle-group button:not(.active):hover {
+            background: #23272e;
+            color: var(--text);
+        }
+        
+        button,
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: .05em;
+            background: var(--bg-panel-alt);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 9px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: .15s;
+        }
+        
+        button:hover {
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button.primary {
+            background: var(--amber);
+            color: #171310;
+            border-color: var(--amber);
+            font-weight: 600;
+        }
+        
+        button.primary:hover {
+            background: #dba847;
+            color: #171310;
+        }
+        
+        button.danger {
+            border-color: var(--red-dim);
+        }
+        
+        button.danger:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        
+        button.ghost {
+            background: transparent;
+        }
+        
+        button:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+        
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--teal);
+            outline-offset: 2px;
+        }
+        
+        input[type=text],
+        input[type=number],
+        select,
+        textarea {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background: var(--bg-inset);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 10px;
+        }
+        
+        input::placeholder {
+            color: var(--text-faint);
+        }
+        /* ---------- game-type selector ---------- */
+        
+        .gametype-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        
+        .gametype-card {
+            flex: 1 1 220px;
+            min-width: 200px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: .15s;
+            position: relative;
+        }
+        
+        .gametype-card:hover {
+            border-color: var(--text-faint);
+        }
+        
+        .gametype-card.selected {
+            border-color: var(--amber);
+            background: linear-gradient(180deg, rgba(201, 150, 60, .08), transparent 60%);
+        }
+        
+        .gametype-card .gt-icon {
+            font-size: 22px;
+        }
+        
+        .gametype-card .gt-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 19px;
+            text-transform: uppercase;
+            letter-spacing: .02em;
+            margin-top: 4px;
+        }
+        
+        .gametype-card .gt-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+        
+        .gametype-card.selected .gt-name {
+            color: var(--amber);
+        }
+        
+        .generate-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .generate-row input[type=text] {
+            width: 150px;
+        }
+        /* ---------- main grid ---------- */
+        
+        .maingrid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        @media (max-width:980px) {
+            .maingrid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .panel-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: .16em;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        
+        .panel-title .count {
+            color: var(--text-dim);
+        }
+        
+        .empty-state {
+            color: var(--text-faint);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            text-align: center;
+            padding: 36px 10px;
+            line-height: 1.7;
+        }
+        
+        .empty-state .big {
+            font-size: 34px;
+            display: block;
+            margin-bottom: 6px;
+            opacity: .6;
+        }
+        /* ---------- scenario briefing ---------- */
+        
+        .briefing-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .briefing-title {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: .02em;
+            color: var(--text);
+            margin: 0 0 2px;
+        }
+        
+        .briefing-sub {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        
+        .classified-stamp {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: .12em;
+            color: var(--red);
+            border: 1.5px solid var(--red);
+            padding: 4px 9px;
+            border-radius: 3px;
+            transform: rotate(3deg);
+            white-space: nowrap;
+            opacity: .85;
+        }
+        
+        .brief-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .brief-field {
+            background: var(--bg-inset);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+        
+        .brief-field .label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: .12em;
+            color: var(--text-faint);
+            text-transform: uppercase;
+        }
+        
+        .brief-field .value {
+            font-size: 14px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        .brief-field.host-only .value {
+            color: var(--amber);
+        }
+        
+        .meter-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        
+        .meter-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: .08em;
+            min-width: 110px;
+        }
+        
+        .meter-track {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-inset);
+            border: 1px solid var(--border-soft);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--teal), var(--red));
+        }
+        
+        .meter-val {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text);
+            min-width: 38px;
+            text-align: right;
+        }
+        
+        .secret-box {
+            margin-top: 16px;
+            border: 1px dashed var(--amber-dim);
+            background: rgba(201, 150, 60, .05);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--amber);
+        }
+        
+        .secret-box .label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: .14em;
+            color: var(--amber);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .regen-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        /* ---------- map ---------- */
+        
+        .map-wrap {
+            position: relative;
+            border: 1px solid var(--border-soft);
+            border-radius: 7px;
+            overflow: hidden;
+            background: linear-gradient(var(--bg-inset), var(--bg-inset)), repeating-linear-gradient(0deg, rgba(255, 255, 255, .02) 0 1px, transparent 1px 26px), repeating-linear-gradient(90deg, rgba(255, 255, 255, .02) 0 1px, transparent 1px 26px);
+        }
+        
+        .map-wrap svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .map-corner {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: var(--amber-dim);
+            opacity: .7;
+            pointer-events: none;
+        }
+        
+        .map-corner.tl {
+            top: 8px;
+            left: 8px;
+            border-top: 2px solid;
+            border-left: 2px solid;
+        }
+        
+        .map-corner.tr {
+            top: 8px;
+            right: 8px;
+            border-top: 2px solid;
+            border-right: 2px solid;
+        }
+        
+        .map-corner.bl {
+            bottom: 8px;
+            left: 8px;
+            border-bottom: 2px solid;
+            border-left: 2px solid;
+        }
+        
+        .map-corner.br {
+            bottom: 8px;
+            right: 8px;
+            border-bottom: 2px solid;
+            border-right: 2px solid;
+        }
+        
+        .map-hint {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-faint);
+            margin-top: 8px;
+        }
+        
+        .room-node {
+            cursor: pointer;
+        }
+        
+        .room-node rect {
+            transition: .15s;
+        }
+        
+        .room-node:hover rect {
+            filter: brightness(1.25);
+        }
+        
+        .room-node text {
+            pointer-events: none;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        .room-node.fogged {
+            cursor: default;
+        }
+        
+        .room-node.fogged:hover rect {
+            filter: none;
+        }
 
-  /* ---------- layout shell ---------- */
-  .shell{max-width:1400px;margin:0 auto;padding:20px 20px 60px;}
+        .map-view-banner {
+            margin: 8px 0;
+            padding: 9px 11px;
+            border: 1px solid var(--border-soft);
+            border-radius: 5px;
+            background: var(--bg-inset);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        .map-view-banner strong { color: var(--text); }
+        .door-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            border: 1px solid var(--border-soft);
+            font-size: 10px;
+            font-family: var(--font-mono);
+            margin: 2px 3px 2px 0;
+        }
+        .room-actions .primary { border-color: var(--teal); }
 
-  header.topbar{
-    display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;
-    border-bottom:1px solid var(--border);
-    padding-bottom:16px;margin-bottom:20px;
-  }
-  .brand{display:flex;align-items:baseline;gap:12px;}
-  .brand .mark{
-    font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;color:var(--text-faint);
-    border:1px solid var(--border);padding:3px 7px;border-radius:3px;
-  }
-  .brand h1{
-    font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:.03em;
-    margin:0;text-transform:uppercase;color:var(--text);
-  }
-  .brand h1 span{color:var(--amber);}
+        /* ---------- players / turn order ---------- */
+        
+        .add-player-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .add-player-row input {
+            flex: 1;
+        }
+        
+        .player-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .player-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-inset);
+            border: 1px solid var(--border-soft);
+            border-radius: 5px;
+            padding: 7px 10px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .player-row .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--teal);
+            flex-shrink: 0;
+        }
+        
+        .player-row .pname {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .player-row .init {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--amber);
+            width: 26px;
+            text-align: center;
+        }
+        
+        .player-row button {
+            padding: 3px 7px;
+            font-size: 11px;
+        }
+        
+        .player-row.current-turn {
+            border-color: var(--amber);
+            background: rgba(201, 150, 60, .08);
+        }
+        
+        .player-row.current-turn .dot {
+            background: var(--amber);
+        }
+        
+        .turn-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        /* ---------- rolls ---------- */
+        
+        .roll-setup {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .roll-setup input {
+            width: 70px;
+        }
+        
+        .roll-row {
+            display: grid;
+            grid-template-columns: 1fr 60px 50px 1fr;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .roll-row .rname {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        
+        .roll-outcome {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-align: right;
+            letter-spacing: .03em;
+        }
+        
+        .roll-outcome.success {
+            color: var(--green);
+        }
+        
+        .roll-outcome.fail {
+            color: var(--red);
+        }
+        
+        .roll-outcome.crit-s {
+            color: var(--amber);
+            font-weight: 600;
+        }
+        
+        .roll-outcome.crit-f {
+            color: var(--red);
+            font-weight: 600;
+        }
+        /* ---------- log ---------- */
+        
+        .log-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 340px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2px;
+        }
+        
+        .log-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .log-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        .log-row {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+            padding: 6px 4px;
+            border-bottom: 1px solid var(--border-soft);
+            font-family: var(--font-mono);
+        }
+        
+        .log-row .t {
+            color: var(--text-faint);
+            flex-shrink: 0;
+        }
+        
+        .log-row .msg {
+            color: var(--text-dim);
+        }
+        
+        .log-row.important .msg {
+            color: var(--text);
+        }
+        /* ---------- save/load ---------- */
+        
+        .savecode {
+            width: 100%;
+            min-height: 64px;
+            resize: vertical;
+            margin-top: 8px;
+        }
+        
+        .save-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        
+        .save-row input {
+            flex: 1;
+            min-width: 160px;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-faint);
+            letter-spacing: .06em;
+        }
+        /* ---------- floor tabs ---------- */
+        
+        .floor-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        
+        .floor-tab {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: .05em;
+            background: var(--bg-inset);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            padding: 6px 11px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .floor-tab.active {
+            background: var(--teal-dim);
+            color: var(--text);
+            border-color: var(--teal);
+        }
+        
+        .floor-tab.add-floor {
+            color: var(--amber);
+            border-style: dashed;
+        }
+        /* ---------- enemies ---------- */
+        
+        .enemy-row {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: var(--bg-inset);
+            border: 1px solid var(--border-soft);
+            border-radius: 5px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+        }
+        
+        .enemy-row .erow-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .enemy-row .ename {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .enemy-row .ehp-text {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .enemy-hpbar {
+            height: 6px;
+            background: var(--bg-panel-alt);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border-soft);
+        }
+        
+        .enemy-hpbar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+        }
+        
+        .enemy-row .erow-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .enemy-row .erow-controls input {
+            width: 56px;
+            padding: 5px 6px;
+        }
+        
+        .enemy-row .erow-controls button {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        
+        .enemy-row.boss-row {
+            border-color: var(--amber);
+            background: rgba(201, 150, 60, .06);
+        }
+        /* ---------- rules / customize ---------- */
+        
+        .rules-body {
+            font-size: 13px;
+            line-height: 1.65;
+            color: var(--text-dim);
+        }
+        
+        .rules-body h3 {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin: 22px 0 8px;
+            border-bottom: 1px solid var(--border-soft);
+            padding-bottom: 5px;
+        }
+        
+        .rules-body h3:first-child {
+            margin-top: 0;
+        }
+        
+        .rules-body p {
+            margin: 0 0 10px;
+        }
+        
+        .rules-body b {
+            color: var(--text);
+        }
+        
+        .rules-body ul {
+            margin: 0 0 10px;
+            padding-left: 20px;
+        }
+        
+        .rules-body li {
+            margin-bottom: 4px;
+        }
+        
+        .loot-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-inset);
+            border: 1px solid var(--border-soft);
+            border-radius: 5px;
+            padding: 7px 10px;
+        }
+        
+        .loot-row.collected .lname {
+            text-decoration: line-through;
+            color: var(--text-faint);
+        }
+        
+        .loot-row .lname {
+            flex: 1;
+            font-size: 13px;
+        }
+        
+        .loot-row .lsource {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--text-faint);
+        }
+        
+        .loot-row input[type=checkbox] {
+            width: 15px;
+            height: 15px;
+            accent-color: var(--teal);
+        }
+        /* ---------- status tags ---------- */
+        
+        .tag-row {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-left: 4px;
+        }
+        
+        .status-chip {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: .04em;
+            background: var(--red-dim);
+            color: #f0c9c6;
+            border: 1px solid var(--red);
+            padding: 2px 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .add-tag-btn {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-faint);
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            padding: 2px 6px;
+            cursor: pointer;
+            background: none;
+        }
+        
+        .add-tag-btn:hover {
+            color: var(--teal);
+            border-color: var(--teal);
+        }
+        
+        .tag-picker {
+            position: absolute;
+            background: var(--bg-panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .4);
+        }
+        
+        .tag-picker button {
+            text-align: left;
+            font-size: 11px;
+            padding: 5px 8px;
+        }
 
-  .topbar-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+        /* ---------- map inspector / inventory ---------- */
+        .map-tools-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:10px; margin-top:10px; }
+        .map-stat { background:var(--bg-inset); border:1px solid var(--border-soft); border-radius:6px; padding:9px 10px; }
+        .map-stat .label { font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; color:var(--text-faint); text-transform:uppercase; }
+        .map-stat .value { margin-top:3px; font-size:12px; color:var(--text); }
+        .room-inspector { background:var(--bg-inset); border:1px solid var(--border); border-radius:7px; padding:12px; margin-top:10px; }
+        .room-inspector h4 { margin:0 0 4px; font-family:var(--font-display); font-size:20px; text-transform:uppercase; }
+        .room-inspector .room-type { font-family:var(--font-mono); font-size:10px; color:var(--amber); letter-spacing:.08em; }
+        .room-detail { margin-top:9px; font-size:12px; line-height:1.5; color:var(--text-dim); }
+        .room-detail b { color:var(--text); }
+        .room-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+        .room-actions button { font-size:10px; padding:6px 8px; }
+        .inventory-row { display:flex; align-items:center; gap:8px; background:var(--bg-inset); border:1px solid var(--border-soft); border-radius:5px; padding:8px 10px; margin-bottom:6px; }
+        .inventory-row .iname { flex:1; font-size:12px; }
+        .inventory-row .owner { font-family:var(--font-mono); font-size:10px; color:var(--text-faint); }
+        .inventory-row .qty { font-family:var(--font-mono); font-size:10px; color:var(--amber); }
+        .inventory-controls { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px; }
+        .inventory-controls select { flex:1; min-width:130px; }
+        .player-location { font-family:var(--font-mono); font-size:10px; color:var(--teal); }
+        @media(max-width:700px){ .map-tools-grid{grid-template-columns:1fr;} }
 
-  .seed-tag{
-    font-family:var(--font-mono);font-size:12px;color:var(--text-dim);
-    background:var(--bg-panel-alt);border:1px solid var(--border);border-radius:4px;
-    padding:6px 10px;display:flex;align-items:center;gap:6px;
-  }
-  .seed-tag b{color:var(--amber);font-weight:600;letter-spacing:.04em;}
+        /* ---------- map quality-of-life ---------- */
+        .map-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:9px;padding:7px 8px;background:var(--bg-inset);border:1px solid var(--border-soft);border-radius:6px;}
+        .map-toolbar .map-zoom-label{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);margin-left:auto;}
+        .map-toolbar button{font-size:11px;padding:5px 8px;}
+        .map-viewport{overflow:auto;max-height:680px;min-height:390px;border:1px solid var(--border-soft);border-radius:7px;background:#0d1014;cursor:grab;}
+        .map-viewport:active{cursor:grabbing;}
+        .map-viewport svg{display:block;min-width:900px;min-height:500px;}
+        .player-marker{cursor:pointer;}
+        .player-marker circle,.player-marker text{transition:.15s;}
+        .player-marker:hover circle{filter:brightness(1.3);stroke-width:2.5;}
+        .player-marker .marker-label{font-family:var(--font-mono);font-weight:700;pointer-events:none;}
+        .player-marker .marker-icon{pointer-events:none;}
+        .player-legend{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
+        .player-legend-item{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;background:var(--bg-inset);border:1px solid var(--border-soft);border-radius:999px;font-size:10px;color:var(--text-dim);cursor:pointer;}
+        .player-legend-dot{width:14px;height:14px;border-radius:50%;display:inline-grid;place-items:center;font-size:9px;color:#101515;border:1px solid rgba(255,255,255,.2);}
+        .player-customize{background:var(--bg-inset);border:1px solid var(--border);border-radius:7px;padding:12px;margin-top:8px;}
+        .customize-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+        .customize-grid label{font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;}
+        .customize-grid input{width:100%;margin-top:4px;}
+        .icon-preview{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:23px;border:2px solid var(--border);margin-bottom:8px;}
+        @media(max-width:700px){.customize-grid{grid-template-columns:1fr;}.map-viewport{min-height:300px;}}
 
-  .toggle-group{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden;}
-  .toggle-group button{
-    background:var(--bg-panel-alt);color:var(--text-dim);border:none;
-    font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;padding:8px 14px;
-    cursor:pointer;transition:.15s;
-  }
-  .toggle-group button.active{background:var(--amber);color:#161311;font-weight:600;}
-  .toggle-group button:not(.active):hover{background:#23272e;color:var(--text);}
-
-  button, .btn{
-    font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;
-    background:var(--bg-panel-alt);color:var(--text);border:1px solid var(--border);
-    padding:9px 14px;border-radius:5px;cursor:pointer;transition:.15s;
-  }
-  button:hover{border-color:var(--teal);color:var(--teal);}
-  button:active{transform:translateY(1px);}
-  button.primary{background:var(--amber);color:#171310;border-color:var(--amber);font-weight:600;}
-  button.primary:hover{background:#dba847;color:#171310;}
-  button.danger{border-color:var(--red-dim);}
-  button.danger:hover{border-color:var(--red);color:var(--red);}
-  button.ghost{background:transparent;}
-  button:disabled{opacity:.35;cursor:not-allowed;}
-  button:focus-visible, input:focus-visible, select:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
-
-  input[type=text], input[type=number], select, textarea{
-    font-family:var(--font-mono);font-size:13px;
-    background:var(--bg-inset);color:var(--text);border:1px solid var(--border);
-    border-radius:4px;padding:8px 10px;
-  }
-  input::placeholder{color:var(--text-faint);}
-
-  /* ---------- game-type selector ---------- */
-  .gametype-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
-  .gametype-card{
-    flex:1 1 220px;min-width:200px;
-    background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;
-    padding:14px 16px;cursor:pointer;transition:.15s;position:relative;
-  }
-  .gametype-card:hover{border-color:var(--text-faint);}
-  .gametype-card.selected{border-color:var(--amber);background:linear-gradient(180deg, rgba(201,150,60,.08), transparent 60%);}
-  .gametype-card .gt-icon{font-size:22px;}
-  .gametype-card .gt-name{
-    font-family:var(--font-display);font-weight:700;font-size:19px;text-transform:uppercase;
-    letter-spacing:.02em;margin-top:4px;
-  }
-  .gametype-card .gt-desc{font-size:12px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
-  .gametype-card.selected .gt-name{color:var(--amber);}
-
-  .generate-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:24px;}
-  .generate-row input[type=text]{width:150px;}
-
-  /* ---------- main grid ---------- */
-  .maingrid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;}
-  @media (max-width:980px){.maingrid{grid-template-columns:1fr;}}
-
-  .panel{
-    background:var(--bg-panel);border:1px solid var(--border);border-radius:9px;
-    padding:18px 20px;margin-bottom:20px;position:relative;
-  }
-  .panel-title{
-    font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;color:var(--text-faint);
-    text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:14px;
-  }
-  .panel-title .count{color:var(--text-dim);}
-
-  .empty-state{
-    color:var(--text-faint);font-family:var(--font-mono);font-size:13px;
-    text-align:center;padding:36px 10px;line-height:1.7;
-  }
-  .empty-state .big{font-size:34px;display:block;margin-bottom:6px;opacity:.6;}
-
-  /* ---------- scenario briefing ---------- */
-  .briefing-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-  .briefing-title{
-    font-family:var(--font-display);font-weight:800;font-size:26px;text-transform:uppercase;
-    letter-spacing:.02em;color:var(--text);margin:0 0 2px;
-  }
-  .briefing-sub{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);}
-  .classified-stamp{
-    font-family:var(--font-mono);font-weight:600;font-size:11px;letter-spacing:.12em;
-    color:var(--red);border:1.5px solid var(--red);padding:4px 9px;border-radius:3px;
-    transform:rotate(3deg);white-space:nowrap;opacity:.85;
-  }
-  .brief-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px;}
-  .brief-field{background:var(--bg-inset);border:1px solid var(--border-soft);border-radius:6px;padding:10px 12px;}
-  .brief-field .label{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;}
-  .brief-field .value{font-size:14px;margin-top:4px;font-weight:500;}
-  .brief-field.host-only .value{color:var(--amber);}
-
-  .meter-row{display:flex;align-items:center;gap:10px;margin-top:14px;}
-  .meter-label{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:.08em;min-width:110px;}
-  .meter-track{flex:1;height:8px;background:var(--bg-inset);border:1px solid var(--border-soft);border-radius:4px;overflow:hidden;}
-  .meter-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--red));}
-  .meter-val{font-family:var(--font-mono);font-size:12px;color:var(--text);min-width:38px;text-align:right;}
-
-  .secret-box{
-    margin-top:16px;border:1px dashed var(--amber-dim);background:rgba(201,150,60,.05);
-    border-radius:6px;padding:10px 14px;font-size:13px;color:var(--amber);
-  }
-  .secret-box .label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:var(--amber);text-transform:uppercase;display:block;margin-bottom:4px;}
-
-  .regen-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;}
-
-  /* ---------- map ---------- */
-  .map-wrap{position:relative;border:1px solid var(--border-soft);border-radius:7px;overflow:hidden;background:
-    linear-gradient(var(--bg-inset), var(--bg-inset)),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 26px),
-    repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 26px);
-  }
-  .map-wrap svg{display:block;width:100%;height:auto;}
-  .map-corner{position:absolute;width:16px;height:16px;border-color:var(--amber-dim);opacity:.7;pointer-events:none;}
-  .map-corner.tl{top:8px;left:8px;border-top:2px solid;border-left:2px solid;}
-  .map-corner.tr{top:8px;right:8px;border-top:2px solid;border-right:2px solid;}
-  .map-corner.bl{bottom:8px;left:8px;border-bottom:2px solid;border-left:2px solid;}
-  .map-corner.br{bottom:8px;right:8px;border-bottom:2px solid;border-right:2px solid;}
-  .map-hint{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin-top:8px;}
-
-  .room-node{cursor:pointer;}
-  .room-node rect{transition:.15s;}
-  .room-node:hover rect{filter:brightness(1.25);}
-  .room-node text{pointer-events:none;font-family:'IBM Plex Mono',monospace;}
-  .room-node.fogged{cursor:default;}
-  .room-node.fogged:hover rect{filter:none;}
-
-  /* ---------- players / turn order ---------- */
-  .add-player-row{display:flex;gap:8px;margin-bottom:12px;}
-  .add-player-row input{flex:1;}
-  .player-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
-  .player-row{
-    display:flex;align-items:center;gap:8px;background:var(--bg-inset);
-    border:1px solid var(--border-soft);border-radius:5px;padding:7px 10px;flex-wrap:wrap;position:relative;
-  }
-  .player-row .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0;}
-  .player-row .pname{flex:1;font-size:13px;font-weight:500;}
-  .player-row .init{font-family:var(--font-mono);font-size:12px;color:var(--amber);width:26px;text-align:center;}
-  .player-row button{padding:3px 7px;font-size:11px;}
-  .player-row.current-turn{border-color:var(--amber);background:rgba(201,150,60,.08);}
-  .player-row.current-turn .dot{background:var(--amber);}
-
-  .turn-controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
-
-  /* ---------- rolls ---------- */
-  .roll-setup{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
-  .roll-setup input{width:70px;}
-  .roll-row{display:grid;grid-template-columns:1fr 60px 50px 1fr;gap:6px;align-items:center;margin-bottom:6px;}
-  .roll-row .rname{font-size:12px;color:var(--text-dim);}
-  .roll-outcome{font-family:var(--font-mono);font-size:11px;text-align:right;letter-spacing:.03em;}
-  .roll-outcome.success{color:var(--green);}
-  .roll-outcome.fail{color:var(--red);}
-  .roll-outcome.crit-s{color:var(--amber);font-weight:600;}
-  .roll-outcome.crit-f{color:var(--red);font-weight:600;}
-
-  /* ---------- log ---------- */
-  .log-list{list-style:none;margin:0;padding:0;max-height:340px;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:2px;}
-  .log-list::-webkit-scrollbar{width:6px;}
-  .log-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-  .log-row{
-    display:flex;gap:8px;font-size:12px;padding:6px 4px;border-bottom:1px solid var(--border-soft);
-    font-family:var(--font-mono);
-  }
-  .log-row .t{color:var(--text-faint);flex-shrink:0;}
-  .log-row .msg{color:var(--text-dim);}
-  .log-row.important .msg{color:var(--text);}
-
-  /* ---------- save/load ---------- */
-  .savecode{width:100%;min-height:64px;resize:vertical;margin-top:8px;}
-  .save-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
-  .save-row input{flex:1;min-width:160px;}
-
-  footer{
-    margin-top:30px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-faint);
-    letter-spacing:.06em;
-  }
-
-  /* ---------- floor tabs ---------- */
-  .floor-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-  .floor-tab{
-    font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;
-    background:var(--bg-inset);color:var(--text-dim);border:1px solid var(--border);
-    padding:6px 11px;border-radius:5px;cursor:pointer;
-  }
-  .floor-tab.active{background:var(--teal-dim);color:var(--text);border-color:var(--teal);}
-  .floor-tab.add-floor{color:var(--amber);border-style:dashed;}
-
-  /* ---------- enemies ---------- */
-  .enemy-row{
-    display:flex;flex-direction:column;gap:5px;background:var(--bg-inset);
-    border:1px solid var(--border-soft);border-radius:5px;padding:8px 10px;margin-bottom:6px;
-  }
-  .enemy-row .erow-top{display:flex;align-items:center;gap:8px;}
-  .enemy-row .ename{flex:1;font-size:13px;font-weight:500;}
-  .enemy-row .ehp-text{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}
-  .enemy-hpbar{height:6px;background:var(--bg-panel-alt);border-radius:3px;overflow:hidden;border:1px solid var(--border-soft);}
-  .enemy-hpbar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));}
-  .enemy-row .erow-controls{display:flex;gap:6px;align-items:center;}
-  .enemy-row .erow-controls input{width:56px;padding:5px 6px;}
-  .enemy-row .erow-controls button{padding:4px 8px;font-size:11px;}
-
-  /* ---------- status tags ---------- */
-  .tag-row{display:flex;gap:4px;flex-wrap:wrap;margin-left:4px;}
-  .status-chip{
-    font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;
-    background:var(--red-dim);color:#f0c9c6;border:1px solid var(--red);
-    padding:2px 6px;border-radius:10px;cursor:pointer;white-space:nowrap;
-  }
-  .add-tag-btn{
-    font-family:var(--font-mono);font-size:10px;color:var(--text-faint);
-    border:1px dashed var(--border);border-radius:10px;padding:2px 6px;cursor:pointer;background:none;
-  }
-  .add-tag-btn:hover{color:var(--teal);border-color:var(--teal);}
-  .tag-picker{
-    position:absolute;background:var(--bg-panel-alt);border:1px solid var(--border);border-radius:6px;
-    padding:6px;z-index:20;display:flex;flex-direction:column;gap:2px;box-shadow:0 6px 20px rgba(0,0,0,.4);
-  }
-  .tag-picker button{text-align:left;font-size:11px;padding:5px 8px;}
-
-  /* ---------- print ---------- */
-  #printArea{display:none;}
-  @media print{
-    body *{visibility:hidden;}
-    #printArea, #printArea *{visibility:visible;}
-    #printArea{display:block;position:absolute;top:0;left:0;width:100%;padding:20px;color:#111;background:#fff;}
-    #printArea h1{font-family:var(--font-display);font-size:26px;margin:0 0 4px;}
-    #printArea h2{font-size:15px;margin:18px 0 6px;border-bottom:1px solid #999;padding-bottom:3px;}
-    #printArea .pf{margin:4px 0;font-size:13px;}
-    #printArea .pf b{display:inline-block;min-width:120px;}
-    #printArea ol{padding-left:20px;font-size:13px;}
-    #printArea li{margin-bottom:3px;}
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{transition:none !important;}
-  }
-</style>
+        /* ---------- print ---------- */
+        
+        #printArea {
+            display: none;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printArea,
+            #printArea * {
+                visibility: visible;
+            }
+            #printArea {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 20px;
+                color: #111;
+                background: #fff;
+            }
+            #printArea h1 {
+                font-family: var(--font-display);
+                font-size: 26px;
+                margin: 0 0 4px;
+            }
+            #printArea h2 {
+                font-size: 15px;
+                margin: 18px 0 6px;
+                border-bottom: 1px solid #999;
+                padding-bottom: 3px;
+            }
+            #printArea .pf {
+                margin: 4px 0;
+                font-size: 13px;
+            }
+            #printArea .pf b {
+                display: inline-block;
+                min-width: 120px;
+            }
+            #printArea ol {
+                padding-left: 20px;
+                font-size: 13px;
+            }
+            #printArea li {
+                margin-bottom: 3px;
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<div class="shell">
+    <div class="shell">
 
-  <header class="topbar">
-    <div class="brand">
-      <span class="mark">OPS//DECK</span>
-      <h1>Scenario<span>&</span>Map Generator</h1>
+        <header class="topbar">
+            <div class="brand">
+                <span class="mark">OPS//DECK</span>
+                <h1>Scenario<span>&</span>Map Generator</h1>
+            </div>
+            <div class="topbar-controls">
+                <div class="seed-tag">SEED <b id="seedDisplay">—</b></div>
+                <div class="toggle-group" role="group" aria-label="Difficulty">
+                    <button data-diff="easy" class="diffBtn">Easy</button>
+                    <button data-diff="normal" class="diffBtn active">Normal</button>
+                    <button data-diff="hard" class="diffBtn">Hard</button>
+                    <button data-diff="deadly" class="diffBtn">Deadly</button>
+                </div>
+                <div class="toggle-group" role="group" aria-label="View mode">
+                    <button id="hostViewBtn" class="active">👑 HOST</button>
+                    <button id="playerViewBtn">🧑 PLAYER</button>
+                </div>
+                <button id="rulesBtn" class="ghost">❔ Host Rules</button>
+            </div>
+        </header>
+
+        <div class="panel" id="rulesPanel" style="display:none;">
+            <div class="panel-title"><span>Running This As Host</span><button id="closeRulesBtn" class="ghost" style="font-size:11px;padding:4px 9px;">✕ Close</button></div>
+            <div class="rules-body">
+
+                <h3>What this actually is</h3>
+                <p>This page is a generator + dashboard for you as GM. It does not play the game for you and it doesn't talk to Discord directly. Its job is: roll up a scenario, a map, an encounter, and loot for you in one click, keep track of the table's
+                    state (players, HP, turn order, what's been found), and give you a place to jot down what actually happens. Dice are still rolled in Discord with Avrae — you type the results back in here.</p>
+
+                <h3>The three game types</h3>
+                <p><b>The Heist</b> — infiltrate a target, grab an objective, get out. <b>Haunted House</b> — survive/escape/uncover the truth in a location with a threat in it. <b>World Collapse</b> — a survival scenario after some kind of disaster. Click
+                    a card at the top to pick one before generating; each has its own word pools for targets/threats/loot/enemies so the flavor stays consistent.</p>
+
+                <h3>Difficulty</h3>
+                <p>The Easy / Normal / Hard / Deadly toggle (top bar) controls how many enemies spawn, how much HP they have, whether a boss shows up, and how dangerous the starting SECURITY/DREAD/STABILITY meter reads. It only applies the <b>next</b> time
+                    you hit Generate Game — changing it mid-game doesn't retroactively touch the current encounter.</p>
+
+                <h3>Generate row</h3>
+                <ul>
+                    <li><b>Seed box</b> — leave blank for a random game. Every generated game shows its seed next to SEED at the top; paste that seed back into this box before hitting Generate to reproduce the exact same scenario/map/encounter later. If you
+                        don't touch the box, Generate always rolls fresh — it won't accidentally repeat itself.</li>
+                    <li><b>🎲 Generate Game</b> — rolls a brand new scenario, map, encounter, and loot list together. Resets turn order.</li>
+                    <li><b>🔄 Regenerate Scenario</b> — rerolls only the target/objective/complication/secret and danger meter. Keeps your current map, enemies, and loot untouched.</li>
+                    <li><b>🗺️ Regenerate Map</b> — rerolls only the map for whichever floor tab is currently active. Keeps the scenario. Also reshuffles which rooms enemies are standing in and rebuilds the loot list to match the new rooms.</li>
+                    <li><b>✎ Customize Word Lists</b> — lets you rewrite the pools the generator draws from (targets, threats, loot, enemy names, boss names, etc.), one line per entry. Pick a game type card first, open this, choose a category, edit the list,
+                        Save. Reset to Default clears your override. Your custom list is used from then on for that game type until you reset it.</li>
+                    <li><b>💾 Save Game / 📂 Load Game</b> — down in the Save/Load panel: Generate Save Code turns your whole current state (scenario, map, floors, players, enemies, loot, turn order) into a text blob you can paste somewhere safe; Load takes
+                        that blob back and restores everything exactly.</li>
+                </ul>
+
+                <h3>Host view vs Player view</h3>
+                <p>Toggle top-right. <b>Host view</b> shows you everything: the GM secret, every room's loot/events/secret flag, enemy positions, locked doors. <b>Player view</b> hides all of that and fogs any room you haven't clicked to reveal yet — this
+                    is the view you should have up if you're sharing your screen with the table.</p>
+
+                <h3>Mission Briefing panel</h3>
+                <p>Shows the generated scenario fields, the danger meter, and (host view only) the GM secret. <b>Click directly on any field's text</b> (or the secret) to type over it — everything the generator picks is a first draft, not final. The 🖨️
+                    Print button builds a clean printable sheet (scenario, room list, players, encounter, loot) and opens your browser's print dialog — save as PDF from there if you want a physical or digital handout.</p>
+
+                <h3>Ops Map panel</h3>
+                <ul>
+                    <li>Floor tabs sit above the map. <b>+ Add Floor</b> generates a second connected map (for multi-level scenarios) and logs a flavor line about stairs connecting them.</li>
+                    <li>In host view, <b>click any room</b> to reveal it — that's the only thing that reveals a room; nothing happens automatically. Once revealed, it also shows up unfogged in Player view.</li>
+                    <li>Icons in a room: 🎁 loot, ⚡ event, ⚑ secret (host only), ⚔ + a number = live enemies posted there (host only), 🔒 on a connecting line = locked door, 📝 = you've added a note to that room.</li>
+                </ul>
+
+                <h3>Room Notes panel</h3>
+                <p>Pick any room from the dropdown, write whatever actually happened there (an Avrae roll result, an ambush, a ruling you made), hit Save Note. It shows up as a 📝 tag on the map. <b>Toggle Locked Door</b> flips whether that room's connecting
+                    door is locked, any time.</p>
+
+                <h3>Loot &amp; Inventory panel</h3>
+                <p>Auto-populated from whatever loot the map generator scattered around (rebuilds when you regenerate the map or add a floor). Check a box to mark something collected — it strikes through. You can also add your own items by hand with an optional
+                    source note.</p>
+
+                <h3>Players panel</h3>
+                <p>Type a name, pick a class from the dropdown, hit Add. <b>+ tag</b> on a player row lets you flag status effects (Hidden, Injured, Poisoned, Down, Restrained, Inspired) — click a tag to remove it. Remove a player with the ✕.</p>
+
+                <h3>How classes actually work here</h3>
+                <p>The class system is very random dawg The heist classes
+                    <li>Thief - -3 in anything related to theiving (debateable)</li>
+                    <li> Rogue - -3 in anything related to sneaking</li>
+                    <li> Hacker - -3 in anything related to tech </li>
+                    <li> Muscle - -3 and + 3 damage in anything related to phyical stuff </li>
+                    Haunted House classes
+                    <li>Priest - +3 damage in exorcism </li>
+                    <li>Cultist - 25% summoning ghost to fight for u or convince ghost </li>
+                    <li>Ghostlore - u can talk to ghost only lmao (good with cultist) </li>
+                    <li> Camera man - U have a set of tools u can use but ur twoshot</li>
+                    <li>Tools - Camera (picture ghost) Flashlight (yes) ECM jammer (hehe no 911 call for u )</li>
+                    WORLD END CLASSESSSS
+                    <li>Scavenger - +3 in anything about scavenging</li>
+                    <li>Medic - +3 in anything about healing</li>
+                    <li>Builder - +3 in anything about Building</li>
+                    <li>Survivalist - +3 in anything about Fighting and a 25% damage boost</li>
+
+
+
+
+
+
+
+                </p>
+
+                <h3>Turn Order panel</h3>
+                <p><b>🎲 Roll Initiative</b> rolls a d20 for every current player <i>and</i> every current enemy and merges them into one sorted list. <b>⏭ Next Turn</b> steps through it and highlights whoever's up, looping back to the top after the last
+                    one.
+                </p>
+
+                <h3>Enemies / NPCs panel</h3>
+                <p>Enemies spawn automatically every time you Generate Game (count and HP scale with Difficulty; on Hard/Deadly there's a chance one is a 👑 boss with much higher HP). Each shows which room it's posted in. <b>🎲 Reroll Encounter</b> scraps
+                    the current enemies and rolls a fresh set without touching the scenario or map. You can also add one manually (name + starting HP). Each enemy row has a damage/heal input — type an amount, hit − Dmg or + Heal, and its HP bar updates.
+                    <b>Dropping an enemy to 0 HP doesn't remove it automatically</b> — it just stops counting toward that room's ⚔ badge on the map. Once it's actually dead and you're done with it, remove it with the ✕ so it stops cluttering the Enemies
+                    panel and turn order.</p>
+
+                <h3>Roll Resolution panel</h3>
+                <p>Set a DC, hit <b>Request Roll</b> — this pulls in whoever's currently in the turn order (or your player list, if no turn order yet) and gives each a row. <b>📋 Copy for Avrae</b> copies a ready-to-paste <code>!r 1d20+MOD dc &lt;DC&gt;</code>                    command for Discord. As each player calls out their Avrae result, type their natural d20 roll and their modifier into that row, then hit <b>Resolve Rolls</b> — it works out success/fail against the DC, and a natural 20 or 1 is automatically
+                    flagged as a crit.</p>
+
+                <h3>Activity Log panel</h3>
+                <p>Everything the tool does — reveals, damage, rolls, joins — logs itself here automatically with a timestamp. There's also a plain text box at the top of the log so <b>you</b> can type in anything that happened in your own words, independent
+                    of the automated entries — useful for narrating outcomes that came from an Avrae roll rather than the built-in roll resolver.</p>
+
+                <h3>Good to know / limitations</h3>
+                <ul>
+                    <li><b>Nothing auto-saves.</b> This all lives in your browser tab only. Closing the tab or refreshing wipes everything unless you clicked Generate Save Code first and kept the text somewhere.</li>
+                    <li><b>No live sync between screens.</b> If your players want to see the map, you either share your screen (in Player view!) or read it out to them — there's no server, so a second device won't see your changes.</li>
+                    <li><b>Revealed rooms can't be re-fogged.</b> Once you click a room to reveal it, there's no button to hide it again in Player view — treat revealing as a one-way action.</li>
+                    <li><b>Difficulty isn't retroactive.</b> Changing it only affects the next full Generate Game, not the encounter you're currently running.</li>
+                    <li><b>Print grabs whatever you're looking at.</b> If you're in Player view when you hit 🖨️ Print, the secret and hidden room contents won't be on the sheet. Switch to Host view first if you want the full GM copy.</li>
+                    <li><b>Regenerating a map on Floor 2+</b> reshuffles that floor's rooms/loot, but currently-placed enemies only get reassigned to new rooms automatically when you regenerate Floor 1 — on other floors, re-post them yourself if the layout
+                        changed a lot.</li>
+                </ul>
+
+            </div>
+
+        </div>
+
+        <div class="gametype-row" id="gametypeRow"></div>
+
+        <div class="generate-row">
+            <input type="text" id="seedInput" placeholder="seed (optional)">
+            <button class="primary" id="genBtn">🎲 GENERATE GAME</button>
+            <button id="regenScenarioBtn">🔄 Regenerate Scenario</button>
+            <button id="regenMapBtn">🗺️ Regenerate Map</button>
+            <button id="customizeBtn">✎ Customize Word Lists</button>
+        </div>
+
+        <div class="panel" id="customizePanel" style="display:none;">
+            <div class="panel-title"><span>Customize Word Lists — <span id="customizeGameTypeLabel"></span></span><button id="closeCustomizeBtn" class="ghost" style="font-size:11px;padding:4px 9px;">✕ Close</button></div>
+            <div class="add-player-row">
+                <select id="customCategorySelect" style="flex:1;"></select>
+            </div>
+            <div class="map-hint">One entry per line. Leave blank and Reset to fall back to the built-in list.</div>
+            <textarea id="customListArea" class="savecode" style="min-height:130px;"></textarea>
+            <div class="save-row">
+                <button id="saveCustomListBtn" class="primary">Save List</button>
+                <button id="resetCustomListBtn" class="danger">Reset to Default</button>
+            </div>
+        </div>
+
+        <div class="maingrid">
+            <!-- LEFT COLUMN -->
+            <div>
+                <div class="panel" id="briefingPanel">
+                    <div class="panel-title"><span>Mission Briefing</span><button id="printBtn" class="ghost" style="font-size:11px;padding:5px 10px;">🖨️ Print</button></div>
+                    <div class="empty-state" id="briefingEmpty">
+                        <span class="big">▤</span> Pick a scenario type above, then hit GENERATE GAME.
+                    </div>
+                    <div id="briefingContent" style="display:none;"></div>
+                </div>
+
+                <div class="panel" id="mapPanel">
+                    <div class="panel-title"><span>Ops Map</span><span class="count" id="mapRoomCount"></span></div>
+                    <div class="floor-tabs" id="floorTabs" style="display:none;"></div>
+                    <div class="map-toolbar" id="mapToolbar" style="display:none;">
+                        <button id="mapZoomOut">−</button><button id="mapZoomReset">100%</button><button id="mapZoomIn">+</button>
+                        <button id="mapCenterBtn">◎ Center</button>
+                        <button id="revealNearbyBtn" style="display:none;">👁️ Reveal Nearby</button>
+                        <button id="revealAllBtn" style="display:none;">🗺️ Reveal All</button>
+                        <span class="map-zoom-label">Scroll to pan · markers show live player locations</span>
+                    </div>
+                    <div id="mapContent"></div>
+                </div>
+
+                <div class="panel" id="roomInspectorPanel" style="display:none;">
+                    <div class="panel-title"><span>Room Inspector</span><span class="count" id="selectedRoomLabel"></span></div>
+                    <div id="roomInspectorContent"></div>
+                </div>
+
+                <div class="panel" id="roomNotesPanel" style="display:none;">
+                    <div class="panel-title"><span>Room Notes</span></div>
+                    <div class="add-player-row">
+                        <select id="roomSelect" style="flex:1;"></select>
+                    </div>
+                    <textarea id="roomNoteArea" class="savecode" style="min-height:70px;" placeholder="What happened here? (e.g. Avrae roll result, ambush, DM ruling...)"></textarea>
+                    <div class="save-row">
+                        <button id="saveRoomNoteBtn" class="primary">Save Note</button>
+                        <button id="toggleLockBtn">Toggle Locked Door</button>
+                    </div>
+                </div>
+
+                <div class="panel" id="lootPanel" style="display:none;">
+                    <div class="panel-title"><span>Loot &amp; Inventory</span><span class="count" id="lootCount"></span></div>
+                    <div class="add-player-row">
+                        <input type="text" id="lootNameInput" placeholder="Item name...">
+                        <input type="text" id="lootSourceInput" placeholder="Source / room (optional)" style="width:150px;">
+                        <button id="addLootBtn">Add</button>
+                    </div>
+                    <div class="inventory-controls">
+                        <select id="inventoryOwnerFilter"><option value="all">All Inventory</option></select>
+                        <button id="clearInventoryFilterBtn" class="ghost">Clear</button>
+                    </div>
+                    <ul class="player-list" id="lootList"></ul>
+                </div>
+
+                <div class="panel" id="inventoryPanel" style="display:none;">
+                    <div class="panel-title"><span>Player Inventories</span><span class="count" id="inventoryCount"></span></div>
+                    <div id="inventoryList"></div>
+                </div>
+
+                <div class="panel" id="saveLoadPanel" style="display:none;">
+                    <div class="panel-title"><span>Save / Load</span></div>
+                    <div class="save-row">
+                        <button id="genSaveCodeBtn">Generate Save Code</button>
+                    </div>
+                    <textarea class="savecode" id="saveCodeArea" placeholder="Save code appears here..." readonly></textarea>
+                    <div class="save-row">
+                        <input type="text" id="loadCodeInput" placeholder="Paste save code to load...">
+                        <button id="applyLoadBtn">Load</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div>
+                <div class="panel">
+                    <div class="panel-title"><span>Players</span><span class="count" id="playerCount">0</span></div>
+                    <div class="add-player-row">
+                        <input type="text" id="playerNameInput" placeholder="Player name...">
+                        <select id="playerClassInput" style="width:110px;"></select>
+                        <button id="addPlayerBtn">Add</button>
+                    </div>
+                    <ul class="player-list" id="playerList"></ul>
+                </div>
+
+                <div class="panel" id="playerCustomizePanel" style="display:none;">
+                    <div class="panel-title"><span>Customize Player Marker</span><button id="closePlayerCustomizeBtn" class="ghost" style="font-size:11px;padding:4px 9px;">✕ Close</button></div>
+                    <div id="playerCustomizeContent"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><span>Turn Order</span></div>
+                    <ul class="player-list" id="turnOrderList"></ul>
+                    <div class="turn-controls">
+                        <button id="rollInitBtn">🎲 Roll Initiative</button>
+                        <button id="nextTurnBtn" class="primary">⏭ Next Turn</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><span>Enemies / NPCs</span><span class="count" id="enemyCount">0</span></div>
+                    <div class="add-player-row">
+                        <input type="text" id="enemyNameInput" placeholder="Enemy name...">
+                        <input type="number" id="enemyHpInput" placeholder="HP" style="width:64px;">
+                        <button id="addEnemyBtn">Add</button>
+                    </div>
+                    <div class="save-row" style="margin-top:0;margin-bottom:10px;">
+                        <button id="rerollEnemiesBtn">🎲 Reroll Encounter</button>
+                    </div>
+                    <ul class="player-list" id="enemyList"></ul>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><span>Roll Resolution</span></div>
+                    <div class="roll-setup">
+                        <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim);">DC</span>
+                        <input type="number" id="dcInput" value="15">
+                        <button id="requestRollBtn">Request Roll</button>
+                        <button id="copyAvraeBtn" title="Copy an Avrae roll command to paste in Discord">📋 Copy for Avrae</button>
+                    </div>
+                    <div class="map-hint" style="margin-top:-6px;margin-bottom:10px;">Enter each player's natural d20 + modifier as read out from Avrae, then resolve.</div>
+                    <div id="rollRows"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><span>Activity Log</span></div>
+                    <div class="add-player-row">
+                        <input type="text" id="manualLogInput" placeholder="Log what happened...">
+                        <button id="manualLogBtn">Log</button>
+                    </div>
+                    <ul class="log-list" id="logList"></ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>OPS DECK — client-side generator. No server, no persistence beyond save codes. Roll dice in Discord with Avrae as usual.</footer>
     </div>
-    <div class="topbar-controls">
-      <div class="seed-tag">SEED <b id="seedDisplay">—</b></div>
-      <div class="toggle-group" role="group" aria-label="View mode">
-        <button id="hostViewBtn" class="active">👑 HOST</button>
-        <button id="playerViewBtn">🧑 PLAYER</button>
-      </div>
-    </div>
-  </header>
 
-  <div class="gametype-row" id="gametypeRow"></div>
+    <div id="printArea"></div>
 
-  <div class="generate-row">
-    <input type="text" id="seedInput" placeholder="seed (optional)">
-    <button class="primary" id="genBtn">🎲 GENERATE GAME</button>
-    <button id="regenScenarioBtn">🔄 Regenerate Scenario</button>
-    <button id="regenMapBtn">🗺️ Regenerate Map</button>
-    <button id="saveBtn">💾 Save Game</button>
-    <button id="loadBtn">📂 Load Game</button>
-  </div>
+    <script>
+        (function() {
+                "use strict";
 
-  <div class="maingrid">
-    <!-- LEFT COLUMN -->
-    <div>
-      <div class="panel" id="briefingPanel">
-        <div class="panel-title"><span>Mission Briefing</span><button id="printBtn" class="ghost" style="font-size:11px;padding:5px 10px;">🖨️ Print</button></div>
-        <div class="empty-state" id="briefingEmpty">
-          <span class="big">▤</span>
-          Pick a scenario type above, then hit GENERATE GAME.
-        </div>
-        <div id="briefingContent" style="display:none;"></div>
-      </div>
+                /* ============================================================
+                   RNG
+                ============================================================ */
+                function hashSeed(str) {
+                    let h = 1779033703 ^ str.length;
+                    for (let i = 0; i < str.length; i++) {
+                        h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+                        h = (h << 13) | (h >>> 19);
+                    }
+                    return function() {
+                        h = Math.imul(h ^ (h >>> 16), 2246822507);
+                        h = Math.imul(h ^ (h >>> 13), 3266489909);
+                        h ^= h >>> 16;
+                        return (h >>> 0);
+                    };
+                }
 
-      <div class="panel" id="mapPanel">
-        <div class="panel-title"><span>Ops Map</span><span class="count" id="mapRoomCount"></span></div>
-        <div class="floor-tabs" id="floorTabs" style="display:none;"></div>
-        <div id="mapContent"></div>
-      </div>
+                function mulberry32(a) {
+                    return function() {
+                        a |= 0;
+                        a = a + 0x6D2B79F5 | 0;
+                        let t = Math.imul(a ^ a >>> 15, 1 | a);
+                        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+                    };
+                }
 
-      <div class="panel" id="roomNotesPanel" style="display:none;">
-        <div class="panel-title"><span>Room Notes</span></div>
-        <div class="add-player-row">
-          <select id="roomSelect" style="flex:1;"></select>
-        </div>
-        <textarea id="roomNoteArea" class="savecode" style="min-height:70px;" placeholder="What happened here? (e.g. Avrae roll result, ambush, DM ruling...)"></textarea>
-        <div class="save-row">
-          <button id="saveRoomNoteBtn" class="primary">Save Note</button>
-          <button id="toggleLockBtn">Toggle Locked Door</button>
-        </div>
-      </div>
+                function makeRng(seedStr) {
+                    const seeder = hashSeed(String(seedStr));
+                    return mulberry32(seeder());
+                }
 
-      <div class="panel" id="saveLoadPanel" style="display:none;">
-        <div class="panel-title"><span>Save / Load</span></div>
-        <div class="save-row">
-          <button id="genSaveCodeBtn">Generate Save Code</button>
-        </div>
-        <textarea class="savecode" id="saveCodeArea" placeholder="Save code appears here..." readonly></textarea>
-        <div class="save-row">
-          <input type="text" id="loadCodeInput" placeholder="Paste save code to load...">
-          <button id="applyLoadBtn">Load</button>
-        </div>
-      </div>
-    </div>
+                function pick(rng, arr) {
+                    return arr[Math.floor(rng() * arr.length)];
+                }
 
-    <!-- RIGHT COLUMN -->
-    <div>
-      <div class="panel">
-        <div class="panel-title"><span>Players</span><span class="count" id="playerCount">0</span></div>
-        <div class="add-player-row">
-          <input type="text" id="playerNameInput" placeholder="Player name...">
-          <button id="addPlayerBtn">Add</button>
-        </div>
-        <ul class="player-list" id="playerList"></ul>
-      </div>
+                function pickN(rng, arr, n) {
+                    const pool = arr.slice();
+                    const out = [];
+                    n = Math.min(n, pool.length);
+                    for (let i = 0; i < n; i++) {
+                        const idx = Math.floor(rng() * pool.length);
+                        out.push(pool.splice(idx, 1)[0]);
+                    }
+                    return out;
+                }
 
-      <div class="panel">
-        <div class="panel-title"><span>Turn Order</span></div>
-        <ul class="player-list" id="turnOrderList"></ul>
-        <div class="turn-controls">
-          <button id="rollInitBtn">🎲 Roll Initiative</button>
-          <button id="nextTurnBtn" class="primary">⏭ Next Turn</button>
-        </div>
-      </div>
+                function randInt(rng, min, max) {
+                    return Math.floor(rng() * (max - min + 1)) + min;
+                }
 
-      <div class="panel">
-        <div class="panel-title"><span>Enemies / NPCs</span><span class="count" id="enemyCount">0</span></div>
-        <div class="add-player-row">
-          <input type="text" id="enemyNameInput" placeholder="Enemy name...">
-          <input type="number" id="enemyHpInput" placeholder="HP" style="width:64px;">
-          <button id="addEnemyBtn">Add</button>
-        </div>
-        <div class="save-row" style="margin-top:0;margin-bottom:10px;">
-          <button id="rerollEnemiesBtn">🎲 Reroll Encounter</button>
-        </div>
-        <ul class="player-list" id="enemyList"></ul>
-      </div>
+                function randSeedString() {
+                    return Math.floor(Math.random() * 900000 + 100000).toString();
+                }
 
-      <div class="panel">
-        <div class="panel-title"><span>Roll Resolution</span></div>
-        <div class="roll-setup">
-          <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim);">DC</span>
-          <input type="number" id="dcInput" value="15">
-          <button id="requestRollBtn">Request Roll</button>
-          <button id="copyAvraeBtn" title="Copy an Avrae roll command to paste in Discord">📋 Copy for Avrae</button>
-        </div>
-        <div class="map-hint" style="margin-top:-6px;margin-bottom:10px;">Enter each player's natural d20 + modifier as read out from Avrae, then resolve.</div>
-        <div id="rollRows"></div>
-      </div>
+                /* ============================================================
+                   GAME TYPE DATA
+                ============================================================ */
+                const GAME_TYPES = {
+                    heist: {
+                        icon: "🏦",
+                        name: "The Heist",
+                        desc: "Infiltrate. Grab the score. Get out clean — or don't.",
+                        fields: ["target", "objective", "complication"],
+                        pools: {
+                            target: ["National Museum", "Federal Bank", "Bio-Research Lab", "Grand Casino", "Ashworth Mansion", "Orbital Station Kestrel", "Overnight Freight Train", "Government Archive", "Diamond Exchange", "Private Airfield Hangar"],
+                            objective: ["Steal the artifact", "Steal classified documents", "Rescue a hostage", "Plant a tracking device", "Retrieve stolen goods", "Empty the vault", "Swap the item for a forgery", "Sabotage the target discreetly"],
+                            complication: ["Security was just increased", "A crew member is a mole", "The target is being moved tonight", "Police are arriving early", "A citywide power outage hits mid-job", "A rival crew is already inside", "The client changed the terms last minute", "An unscheduled inspection is underway"],
+                            secret: ["The security office holds an alarm override switch.", "One guard is being blackmailed and can be turned.", "The real prize is a fake — the original was moved last week.", "There's a second, hidden vault behind the first.", "The client hired a second crew as backup insurance."]
+                        },
+                        rooms: ["Entrance", "Lobby", "Gallery", "Security Room", "Server Closet", "Loading Dock", "Executive Office", "Stairwell", "Rooftop Access", "Archive Room", "Vault Antechamber", "Vault", "Escape Route", "Parking Garage", "Maintenance Tunnel"],
+                        startRoom: "Entrance",
+                        endRoom: "Vault",
+                        loot: ["Cash bundle", "Jewelry case", "Data drive", "Prototype blueprint", "Forged documents", "Gold bars", "Rare artifact", "Keycard"],
+                        events: ["Guard patrol passes through", "Motion sensor triggers", "Radio chatter overheard", "Camera loop window (60s)", "Unlocked side passage found", "Silent alarm nearly tripped"],
+                        enemies: ["Security Guard", "Rival Thief", "Rooftop Sniper", "Attack Dog", "In-house Hacker", "Enforcer", "Undercover Agent"],
+                        boss: ["Head of Security", "The Fixer", "Rival Crew Leader"],
+                        meterLabel: "SECURITY",
+                        meterMax: 10
+                    },
+                    haunted: {
+                        icon: "🕯️",
+                        name: "Haunted House",
+                        desc: "Something in the walls remembers you arrived.",
+                        fields: ["location", "threat", "objective"],
+                        pools: {
+                            location: ["Abandoned Mansion", "Derelict Hospital", "Shuttered Hotel", "Old Schoolhouse", "Decommissioned Prison", "Underground Facility", "Cliffside Lighthouse", "Flooded Manor"],
+                            threat: ["A vengeful ghost", "A hunting creature", "An old curse", "The building itself, possessed", "An entity no one understands", "Something that mimics voices", "A presence that counts your steps", "A ghost that resets the night at dawn"],
+                            objective: ["Escape before sunrise", "Find the hidden artifact", "Discover the truth of what happened here", "Rescue someone trapped inside", "Collect the scattered clues", "Survive until sunrise", "Break the curse at its source", "Put the spirit to rest"],
+                            secret: ["The attic holds the truth — a name everyone forgot.", "One player is already marked by the entity.", "The exit only opens if the ritual circle is completed first.", "The basement isn't part of the original house.", "Leaving an item behind traps you here forever."]
+                        },
+                        rooms: ["Attic", "Hallway", "Master Bedroom", "Balcony", "Lobby", "Kitchen", "Basement", "Tunnel", "Library", "Cellar", "Chapel", "Nursery", "Dining Hall", "Servant's Quarters", "Wine Cellar"],
+                        startRoom: "Lobby",
+                        endRoom: "Attic",
+                        loot: ["Rusted key", "Torn diary page", "Old photograph", "Silver locket", "Candle stub", "Strange sigil stone", "Music box", "Faded letter"],
+                        events: ["A door slams shut on its own", "Whispers from an empty room", "Cold spot crosses the hallway", "Lights flicker and die", "Footsteps on the floor above", "A clock strikes the wrong hour"],
+                        enemies: ["Restless Spirit", "Shadow Creature", "Possessed Doll", "Wailing Ghoul", "Animated Suit of Armor", "Crawling Shade", "The Watcher"],
+                        boss: ["The Bound Spirit", "Ancient Guardian", "The House Itself"],
+                        meterLabel: "DREAD",
+                        meterMax: 10
+                    },
+                    collapse: {
+                        icon: "🌎",
+                        name: "World Collapse",
+                        desc: "The world ended quietly. Now you just have to survive it.",
+                        fields: ["world", "disaster", "objective"],
+                        pools: {
+                            world: ["Flooded City", "Frozen Wasteland", "Collapsed Metro Sprawl", "Scorched Desert Basin", "Overgrown Forest Ruins", "Island Outpost", "Storm-Locked Coastline"],
+                            disaster: ["Nuclear disaster", "Runaway climate collapse", "Alien incursion", "Outbreak of the infected", "Superstorm system", "Volcanic eruption", "Total infrastructure failure", "Orbital debris cascade"],
+                            objective: ["Reach the evacuation zone", "Build a working shelter", "Repair the emergency radio", "Find medicine for the group", "Reach the bunker before nightfall", "Survive for three days", "Recover the last supply cache", "Guide the convoy to safety"],
+                            secret: ["The evac tower stopped transmitting six hours ago.", "One survivor is hiding a bite/exposure.", "There's a working vehicle two blocks from the start — undocumented.", "The shelter's supplies were looted last week.", "A second group is tracking the same objective."]
+                        },
+                        rooms: ["Shelter", "Corner Store", "Hospital Wing", "Collapsed Bridge", "Subway Platform", "Workshop", "Evacuation Tower", "Rooftop", "Warehouse", "Checkpoint", "Farmstead", "Overpass", "Radio Tower", "Flooded Underpass", "Fuel Depot"],
+                        startRoom: "Shelter",
+                        endRoom: "Evacuation Tower",
+                        loot: ["Ration pack", "Medical supplies", "Scrap materials", "Fuel canister", "Water purifier", "Spare battery", "Tool kit", "Signal flare"],
+                        events: ["Aftershock rattles the area", "Distant scavenger group spotted", "Structure groans — unstable footing", "Radio static briefly clears", "Supply cache found untouched", "Weather turns without warning"],
+                        enemies: ["Raider", "Infected Wanderer", "Scavenger", "Rogue Drone", "Mutated Beast", "Looter", "Desperate Survivor"],
+                        boss: ["Raider Warlord", "Alpha Mutant", "Rogue Convoy AI"],
+                        meterLabel: "STABILITY",
+                        meterMax: 10
+                    }
+                };
 
-      <div class="panel">
-        <div class="panel-title"><span>Activity Log</span></div>
-        <div class="add-player-row">
-          <input type="text" id="manualLogInput" placeholder="Log what happened...">
-          <button id="manualLogBtn">Log</button>
-        </div>
-        <ul class="log-list" id="logList"></ul>
-      </div>
-    </div>
-  </div>
+                /* ============================================================
+                   STATE
+                ============================================================ */
+                let state = {
+                    seed: null,
+                    lastAutoSeed: null,
+                    gameType: "heist",
+                    difficulty: "normal",
+                    scenario: null,
+                    map: null,
+                    floors: [], // array of map objects (multi-floor support)
+                    currentFloorIdx: 0,
+                    hostView: true,
+                    players: [], // {id,name,tags:[],cls,hp,maxHp,locationId,icon,color}
+                    enemies: [], // {id,name,maxHp,hp,isBoss}
+                    turnOrder: [], // {id,type:'player'|'enemy',init}
+                    currentTurnIdx: -1,
+                    loot: [], // {id,name,source,collected,ownerId,roomId,quantity}
+                    selectedRoomId: null,
+                    inventoryFilter: "all",
+                    mapZoom: 1,
+                    customPools: {}, // {gameType: {category: [lines]}}
+                    log: [],
+                    rollDC: 15,
+                    rollRows: [] // {playerId,name,natural,mod}
+                };
+                const STATUS_TAGS = ["Hidden", "Injured", "Poisoned", "Down", "Restrained", "Inspired"];
+                const CLASS_LIST = ["Thief", "Rogue", "Hacker", "Muscle", "Priest", "Cultist", "Ghostlore", "Camera man", "Scavenger", "Medic", "Builder", "survivalist"];
+                const DIFFICULTY = {
+                    easy: {
+                        label: "Easy",
+                        enemyCount: [1, 2],
+                        hp: [6, 14],
+                        meter: [1, 4],
+                        bossChance: 0
+                    },
+                    normal: {
+                        label: "Normal",
+                        enemyCount: [2, 4],
+                        hp: [8, 26],
+                        meter: [2, 7],
+                        bossChance: 0.15
+                    },
+                    hard: {
+                        label: "Hard",
+                        enemyCount: [3, 5],
+                        hp: [14, 32],
+                        meter: [4, 9],
+                        bossChance: 0.45
+                    },
+                    deadly: {
+                        label: "Deadly",
+                        enemyCount: [4, 6],
+                        hp: [20, 40],
+                        meter: [6, 10],
+                        bossChance: 0.8
+                    }
+                };
+                let uidCounter = 1;
 
-  <footer>OPS DECK — client-side generator. No server, no persistence beyond save codes. Roll dice in Discord with Avrae as usual.</footer>
-</div>
+                function uid() {
+                    return "id" + (uidCounter++);
+                }
 
-<div id="printArea"></div>
+                function entityById(id, type) {
+                    return type === "enemy" ? state.enemies.find(e => e.id === id) : state.players.find(p => p.id === id);
+                }
 
-<script>
-(function(){
-"use strict";
+                function getPool(typeKey, category) {
+                    const custom = state.customPools[typeKey] && state.customPools[typeKey][category];
+                    if (custom && custom.length) return custom;
+                    const type = GAME_TYPES[typeKey];
+                    if (type.pools[category]) return type.pools[category];
+                    if (type[category]) return type[category];
+                    return [];
+                }
 
-/* ============================================================
-   RNG
-============================================================ */
-function hashSeed(str){
-  let h = 1779033703 ^ str.length;
-  for (let i=0;i<str.length;i++){
-    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-    h = (h << 13) | (h >>> 19);
-  }
-  return function(){
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    h ^= h >>> 16;
-    return (h >>> 0);
-  };
-}
-function mulberry32(a){
-  return function(){
-    a |= 0; a = a + 0x6D2B79F5 | 0;
-    let t = Math.imul(a ^ a >>> 15, 1 | a);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
-function makeRng(seedStr){
-  const seeder = hashSeed(String(seedStr));
-  return mulberry32(seeder());
-}
-function pick(rng, arr){ return arr[Math.floor(rng()*arr.length)]; }
-function pickN(rng, arr, n){
-  const pool = arr.slice();
-  const out = [];
-  n = Math.min(n, pool.length);
-  for (let i=0;i<n;i++){
-    const idx = Math.floor(rng()*pool.length);
-    out.push(pool.splice(idx,1)[0]);
-  }
-  return out;
-}
-function randInt(rng, min, max){ return Math.floor(rng()*(max-min+1))+min; }
-function randSeedString(){ return Math.floor(Math.random()*900000+100000).toString(); }
+                /* ============================================================
+                   SCENARIO GENERATION
+                ============================================================ */
+                function generateScenario(typeKey, rng) {
+                    const type = GAME_TYPES[typeKey];
+                    const s = {
+                        fields: {}
+                    };
+                    type.fields.forEach(f => {
+                        s.fields[f] = pick(rng, getPool(typeKey, f));
+                    });
+                    s.secret = pick(rng, getPool(typeKey, "secret"));
+                    const diff = DIFFICULTY[state.difficulty] || DIFFICULTY.normal;
+                    s.meter = randInt(rng, diff.meter[0], diff.meter[1]);
+                    s.meterMax = type.meterMax;
+                    s.meterLabel = type.meterLabel;
+                    return s;
+                }
 
-/* ============================================================
-   GAME TYPE DATA
-============================================================ */
-const GAME_TYPES = {
-  heist: {
-    icon:"🏦", name:"The Heist", desc:"Infiltrate. Grab the score. Get out clean — or don't.",
-    fields: ["target","objective","complication"],
-    pools: {
-      target:["National Museum","Federal Bank","Bio-Research Lab","Grand Casino","Ashworth Mansion","Orbital Station Kestrel","Overnight Freight Train","Government Archive","Diamond Exchange","Private Airfield Hangar"],
-      objective:["Steal the artifact","Steal classified documents","Rescue a hostage","Plant a tracking device","Retrieve stolen goods","Empty the vault","Swap the item for a forgery","Sabotage the target discreetly"],
-      complication:["Security was just increased","A crew member is a mole","The target is being moved tonight","Police are arriving early","A citywide power outage hits mid-job","A rival crew is already inside","The client changed the terms last minute","An unscheduled inspection is underway"],
-      secret:["The security office holds an alarm override switch.","One guard is being blackmailed and can be turned.","The real prize is a fake — the original was moved last week.","There's a second, hidden vault behind the first.","The client hired a second crew as backup insurance."]
-    },
-    rooms:["Entrance","Lobby","Gallery","Security Room","Server Closet","Loading Dock","Executive Office","Stairwell","Rooftop Access","Archive Room","Vault Antechamber","Vault","Escape Route","Parking Garage","Maintenance Tunnel"],
-    startRoom:"Entrance", endRoom:"Vault",
-    loot:["Cash bundle","Jewelry case","Data drive","Prototype blueprint","Forged documents","Gold bars","Rare artifact","Keycard"],
-    events:["Guard patrol passes through","Motion sensor triggers","Radio chatter overheard","Camera loop window (60s)","Unlocked side passage found","Silent alarm nearly tripped"],
-    enemies:["Security Guard","Rival Thief","Rooftop Sniper","Attack Dog","In-house Hacker","Enforcer","Undercover Agent"],
-    meterLabel:"SECURITY", meterMax:10
-  },
-  haunted: {
-    icon:"🕯️", name:"Haunted House", desc:"Something in the walls remembers you arrived.",
-    fields: ["location","threat","objective"],
-    pools: {
-      location:["Abandoned Mansion","Derelict Hospital","Shuttered Hotel","Old Schoolhouse","Decommissioned Prison","Underground Facility","Cliffside Lighthouse","Flooded Manor"],
-      threat:["A vengeful ghost","A hunting creature","An old curse","The building itself, possessed","An entity no one understands","Something that mimics voices","A presence that counts your steps","A ghost that resets the night at dawn"],
-      objective:["Escape before sunrise","Find the hidden artifact","Discover the truth of what happened here","Rescue someone trapped inside","Collect the scattered clues","Survive until sunrise","Break the curse at its source","Put the spirit to rest"],
-      secret:["The attic holds the truth — a name everyone forgot.","One player is already marked by the entity.","The exit only opens if the ritual circle is completed first.","The basement isn't part of the original house.","Leaving an item behind traps you here forever."]
-    },
-    rooms:["Attic","Hallway","Master Bedroom","Balcony","Lobby","Kitchen","Basement","Tunnel","Library","Cellar","Chapel","Nursery","Dining Hall","Servant's Quarters","Wine Cellar"],
-    startRoom:"Lobby", endRoom:"Attic",
-    loot:["Rusted key","Torn diary page","Old photograph","Silver locket","Candle stub","Strange sigil stone","Music box","Faded letter"],
-    events:["A door slams shut on its own","Whispers from an empty room","Cold spot crosses the hallway","Lights flicker and die","Footsteps on the floor above","A clock strikes the wrong hour"],
-    enemies:["Restless Spirit","Shadow Creature","Possessed Doll","Wailing Ghoul","Animated Suit of Armor","Crawling Shade","The Watcher"],
-    meterLabel:"DREAD", meterMax:10
-  },
-  collapse: {
-    icon:"🌎", name:"World Collapse", desc:"The world ended quietly. Now you just have to survive it.",
-    fields: ["world","disaster","objective"],
-    pools: {
-      world:["Flooded City","Frozen Wasteland","Collapsed Metro Sprawl","Scorched Desert Basin","Overgrown Forest Ruins","Island Outpost","Storm-Locked Coastline"],
-      disaster:["Nuclear disaster","Runaway climate collapse","Alien incursion","Outbreak of the infected","Superstorm system","Volcanic eruption","Total infrastructure failure","Orbital debris cascade"],
-      objective:["Reach the evacuation zone","Build a working shelter","Repair the emergency radio","Find medicine for the group","Reach the bunker before nightfall","Survive for three days","Recover the last supply cache","Guide the convoy to safety"],
-      secret:["The evac tower stopped transmitting six hours ago.","One survivor is hiding a bite/exposure.","There's a working vehicle two blocks from the start — undocumented.","The shelter's supplies were looted last week.","A second group is tracking the same objective."]
-    },
-    rooms:["Shelter","Corner Store","Hospital Wing","Collapsed Bridge","Subway Platform","Workshop","Evacuation Tower","Rooftop","Warehouse","Checkpoint","Farmstead","Overpass","Radio Tower","Flooded Underpass","Fuel Depot"],
-    startRoom:"Shelter", endRoom:"Evacuation Tower",
-    loot:["Ration pack","Medical supplies","Scrap materials","Fuel canister","Water purifier","Spare battery","Tool kit","Signal flare"],
-    events:["Aftershock rattles the area","Distant scavenger group spotted","Structure groans — unstable footing","Radio static briefly clears","Supply cache found untouched","Weather turns without warning"],
-    enemies:["Raider","Infected Wanderer","Scavenger","Rogue Drone","Mutated Beast","Looter","Desperate Survivor"],
-    meterLabel:"STABILITY", meterMax:10
-  }
-};
+                /* ============================================================
+                   MAP GENERATION
+                ============================================================ */
+                function generateMap(typeKey, rng) {
+                    const type = GAME_TYPES[typeKey];
+                    const roomCount = randInt(rng, 10, 14);
+                    const roomPool = getPool(typeKey, "rooms");
+                    const namePool = roomPool.filter(r => r !== type.startRoom && r !== type.endRoom);
+                    const middleNames = pickN(rng, namePool, roomCount - 2);
+                    const names = [type.startRoom, ...middleNames, type.endRoom];
 
-/* ============================================================
-   STATE
-============================================================ */
-let state = {
-  seed: null,
-  gameType: "heist",
-  scenario: null,
-  map: null,
-  floors: [], // array of map objects (multi-floor support)
-  currentFloorIdx: 0,
-  hostView: true,
-  players: [], // {id,name,tags:[]}
-  enemies: [], // {id,name,maxHp,hp}
-  turnOrder: [], // {id,type:'player'|'enemy',init}
-  currentTurnIdx: -1,
-  log: [],
-  rollDC: 15,
-  rollRows: [] // {playerId,name,natural,mod}
-};
-const STATUS_TAGS = ["Hidden","Injured","Poisoned","Down","Restrained","Inspired"];
-let uidCounter = 1;
-function uid(){ return "id"+(uidCounter++); }
-function entityById(id, type){
-  return type==="enemy" ? state.enemies.find(e=>e.id===id) : state.players.find(p=>p.id===id);
-}
+                    const rooms = names.map((name, i) => ({
+                        id: "r" + i,
+                        name,
+                        isStart: i === 0,
+                        isObjective: i === names.length - 1,
+                        revealed: i === 0, // start room always revealed
+                        hasSecret: false,
+                        loot: null,
+                        event: null,
+                        locked: false,
+                        connections: []
+                    }));
 
-/* ============================================================
-   SCENARIO GENERATION
-============================================================ */
-function generateScenario(typeKey, rng){
-  const type = GAME_TYPES[typeKey];
-  const s = { fields:{} };
-  type.fields.forEach(f=>{ s.fields[f] = pick(rng, type.pools[f]); });
-  s.secret = pick(rng, type.pools.secret);
-  s.meter = randInt(rng, 2, type.meterMax);
-  s.meterMax = type.meterMax;
-  s.meterLabel = type.meterLabel;
-  return s;
-}
+                    // build a random tree (skip index0 which is root)
+                    const levelOf = {
+                        0: 0
+                    };
+                    const placedOrder = [0];
+                    for (let i = 1; i < rooms.length - 1; i++) {
+                        const parentIdx = placedOrder[Math.floor(rng() * placedOrder.length)];
+                        connect(rooms[parentIdx], rooms[i]);
+                        levelOf[i] = levelOf[parentIdx] + 1;
+                        placedOrder.push(i);
+                    }
+                    // attach objective (last room) to one of the deepest nodes for distance
+                    let maxLevel = Math.max(...Object.values(levelOf));
+                    const deepCandidates = placedOrder.filter(i => levelOf[i] === maxLevel);
+                    const objParent = pick(rng, deepCandidates);
+                    const objIdx = rooms.length - 1;
+                    connect(rooms[objParent], rooms[objIdx]);
+                    levelOf[objIdx] = levelOf[objParent] + 1;
+                    placedOrder.push(objIdx);
+                    maxLevel = Math.max(maxLevel, levelOf[objIdx]);
 
-/* ============================================================
-   MAP GENERATION
-============================================================ */
-function generateMap(typeKey, rng){
-  const type = GAME_TYPES[typeKey];
-  const roomCount = randInt(rng, 6, 8);
-  const namePool = type.rooms.filter(r=>r!==type.startRoom && r!==type.endRoom);
-  const middleNames = pickN(rng, namePool, roomCount-2);
-  const names = [type.startRoom, ...middleNames, type.endRoom];
+                    function connect(a, b) {
+                        a.connections.push(b.id);
+                        b.connections.push(a.id);
+                    }
 
-  const rooms = names.map((name,i)=>({
-    id: "r"+i,
-    name,
-    isStart: i===0,
-    isObjective: i===names.length-1,
-    revealed: i===0, // start room always revealed
-    hasSecret:false,
-    loot: null,
-    event: null,
-    locked:false,
-    connections: []
-  }));
+                    // extra loop edges (1-2) between same-or-adjacent level nodes not yet connected
+                    const extraEdges = randInt(rng, 1, 2);
+                    let attempts = 0;
+                    let added = 0;
+                    while (added < extraEdges && attempts < 40) {
+                        attempts++;
+                        const a = rooms[Math.floor(rng() * rooms.length)];
+                        const b = rooms[Math.floor(rng() * rooms.length)];
+                        if (a.id === b.id) continue;
+                        if (Math.abs(levelOf[rooms.indexOf(a)] - levelOf[rooms.indexOf(b)]) > 1) continue;
+                        if (a.connections.includes(b.id)) continue;
+                        connect(a, b);
+                        added++;
+                    }
 
-  // build a random tree (skip index0 which is root)
-  const levelOf = {0:0};
-  const placedOrder = [0];
-  for (let i=1;i<rooms.length-1;i++){
-    const parentIdx = placedOrder[Math.floor(rng()*placedOrder.length)];
-    connect(rooms[parentIdx], rooms[i]);
-    levelOf[i] = levelOf[parentIdx]+1;
-    placedOrder.push(i);
-  }
-  // attach objective (last room) to one of the deepest nodes for distance
-  let maxLevel = Math.max(...Object.values(levelOf));
-  const deepCandidates = placedOrder.filter(i=>levelOf[i]===maxLevel);
-  const objParent = pick(rng, deepCandidates);
-  const objIdx = rooms.length-1;
-  connect(rooms[objParent], rooms[objIdx]);
-  levelOf[objIdx] = levelOf[objParent]+1;
-  placedOrder.push(objIdx);
-  maxLevel = Math.max(maxLevel, levelOf[objIdx]);
+                    // assign features: loot on ~half, event on a few, one secret room (not start), maybe lock a door
+                    const lootPool = getPool(typeKey, "loot");
+                    const eventPool = getPool(typeKey, "events");
+                    rooms.forEach((r, i) => {
+                        if (r.isStart) return;
+                        const roll = rng();
+                        if (roll < 0.45) r.loot = pick(rng, lootPool);
+                        else if (roll < 0.68) r.event = pick(rng, eventPool);
+                    });
+                    const nonStart = rooms.filter(r => !r.isStart);
+                    const secretRoom = pick(rng, nonStart);
+                    secretRoom.hasSecret = true;
 
-  function connect(a,b){
-    a.connections.push(b.id);
-    b.connections.push(a.id);
-  }
+                    // lock the door leading into the objective room (flavor)
+                    const objRoom = rooms[objIdx];
+                    if (objRoom.connections.length) {
+                        objRoom.locked = true;
+                    }
 
-  // extra loop edges (1-2) between same-or-adjacent level nodes not yet connected
-  const extraEdges = randInt(rng,1,2);
-  let attempts=0;
-  let added=0;
-  while(added<extraEdges && attempts<40){
-    attempts++;
-    const a = rooms[Math.floor(rng()*rooms.length)];
-    const b = rooms[Math.floor(rng()*rooms.length)];
-    if (a.id===b.id) continue;
-    if (Math.abs(levelOf[rooms.indexOf(a)]-levelOf[rooms.indexOf(b)])>1) continue;
-    if (a.connections.includes(b.id)) continue;
-    connect(a,b);
-    added++;
-  }
+                    // layout coordinates by level
+                    const levels = {};
+                    rooms.forEach((r, i) => {
+                        const lvl = levelOf[i];
+                        if (!levels[lvl]) levels[lvl] = [];
+                        levels[lvl].push(r);
+                    });
+                    const boxW = 170,
+                        boxH = 72,
+                        colGap = 210,
+                        rowGap = 145,
+                        padX = 120,
+                        padY = 90;
+                    const maxCols = Math.max(...Object.values(levels).map(a => a.length));
+                    const width = Math.max(900, maxCols * colGap + padX * 2);
+                    Object.keys(levels).forEach(lvlKey => {
+                        const arr = levels[lvlKey];
+                        const n = arr.length;
+                        arr.forEach((r, i) => {
+                            const slotW = width / (n + 1);
+                            const jitter = (rng() - 0.5) * 18;
+                            r.x = slotW * (i + 1) + jitter;
+                            r.y = padY + Number(lvlKey) * rowGap;
+                        });
+                    });
+                    const height = padY * 2 + maxLevel * rowGap + 20;
 
-  // assign features: loot on ~half, event on a few, one secret room (not start), maybe lock a door
-  rooms.forEach((r,i)=>{
-    if (r.isStart) return;
-    const roll = rng();
-    if (roll < 0.45) r.loot = pick(rng, type.loot);
-    else if (roll < 0.68) r.event = pick(rng, type.events);
-  });
-  const nonStart = rooms.filter(r=>!r.isStart);
-  const secretRoom = pick(rng, nonStart);
-  secretRoom.hasSecret = true;
+                    return {
+                        rooms,
+                        width,
+                        height,
+                        boxW,
+                        boxH,
+                        roomCount: rooms.length
+                    };
+                }
 
-  // lock the door leading into the objective room (flavor)
-  const objRoom = rooms[objIdx];
-  if (objRoom.connections.length){
-    objRoom.locked = true;
-  }
+                /* ============================================================
+                   ENEMY GENERATION
+                ============================================================ */
+                function generateEnemies(typeKey, rng, map) {
+                    const diff = DIFFICULTY[state.difficulty] || DIFFICULTY.normal;
+                    const enemyPool = getPool(typeKey, "enemies");
+                    const bossPool = getPool(typeKey, "boss");
+                    const count = randInt(rng, diff.enemyCount[0], diff.enemyCount[1]);
+                    const nonStartRooms = map.rooms.filter(r => !r.isStart);
+                    const enemies = [];
+                    for (let i = 0; i < count; i++) {
+                        const baseName = pick(rng, enemyPool);
+                        const hp = randInt(rng, diff.hp[0], diff.hp[1]);
+                        const room = nonStartRooms.length ? pick(rng, nonStartRooms) : null;
+                        enemies.push({
+                            id: uid(),
+                            name: baseName,
+                            maxHp: hp,
+                            hp,
+                            roomId: room ? room.id : null,
+                            roomName: room ? room.name : null,
+                            isBoss: false
+                        });
+                    }
+                    if (bossPool.length && rng() < diff.bossChance) {
+                        const bossName = pick(rng, bossPool);
+                        const bossHp = randInt(rng, Math.round(diff.hp[1] * 1.6), Math.round(diff.hp[1] * 2.4));
+                        const room = nonStartRooms.length ? pick(rng, nonStartRooms) : null;
+                        enemies.push({
+                            id: uid(),
+                            name: bossName,
+                            maxHp: bossHp,
+                            hp: bossHp,
+                            roomId: room ? room.id : null,
+                            roomName: room ? room.name : null,
+                            isBoss: true
+                        });
+                    }
+                    const seenCount = {};
+                    enemies.forEach(e => {
+                        seenCount[e.name] = (seenCount[e.name] || 0) + 1;
+                    });
+                    const seenSoFar = {};
+                    enemies.forEach(e => {
+                        if (seenCount[e.name] > 1) {
+                            seenSoFar[e.name] = (seenSoFar[e.name] || 0) + 1;
+                            e.name = e.name + " #" + seenSoFar[e.name];
+                        }
+                    });
+                    return enemies;
+                }
 
-  // layout coordinates by level
-  const levels = {};
-  rooms.forEach((r,i)=>{
-    const lvl = levelOf[i];
-    if (!levels[lvl]) levels[lvl]=[];
-    levels[lvl].push(r);
-  });
-  const boxW=140, boxH=58, colGap=170, rowGap=110, padX=90, padY=70;
-  const maxCols = Math.max(...Object.values(levels).map(a=>a.length));
-  const width = Math.max(560, maxCols*colGap + padX*2);
-  Object.keys(levels).forEach(lvlKey=>{
-    const arr = levels[lvlKey];
-    const n = arr.length;
-    arr.forEach((r,i)=>{
-      const slotW = width/(n+1);
-      const jitter = (rng()-0.5)*18;
-      r.x = slotW*(i+1) + jitter;
-      r.y = padY + Number(lvlKey)*rowGap;
-    });
-  });
-  const height = padY*2 + maxLevel*rowGap + 20;
+                function reassignEnemiesToMap(map) {
+                    const nonStartRooms = map.rooms.filter(r => !r.isStart);
+                    if (!nonStartRooms.length) return;
+                    state.enemies.forEach(e => {
+                        const room = nonStartRooms[Math.floor(Math.random() * nonStartRooms.length)];
+                        e.roomId = room.id;
+                        e.roomName = room.name;
+                    });
+                }
 
-  return { rooms, width, height, boxW, boxH, roomCount: rooms.length };
-}
+                function buildLootFromMap(map, replace) {
+                    const items = [];
+                    map.rooms.forEach(r => {
+                        if (r.loot) items.push({
+                            id: uid(),
+                            name: r.loot,
+                            source: r.name,
+                            roomId: r.id,
+                            collected: false,
+                            ownerId: null,
+                            quantity: 1
+                        });
+                    });
+                    if (replace) state.loot = items;
+                    else state.loot = state.loot.concat(items);
+                }
 
-/* ============================================================
-   ENEMY GENERATION
-============================================================ */
-function generateEnemies(typeKey, rng, map){
-  const type = GAME_TYPES[typeKey];
-  const count = randInt(rng, 2, 4);
-  const nonStartRooms = map.rooms.filter(r=>!r.isStart);
-  const enemies = [];
-  for (let i=0;i<count;i++){
-    const baseName = pick(rng, type.enemies);
-    const hp = randInt(rng, 8, 26);
-    const room = nonStartRooms.length ? pick(rng, nonStartRooms) : null;
-    enemies.push({id:uid(), name:baseName, maxHp:hp, hp, roomId: room?room.id:null, roomName: room?room.name:null});
-  }
-  const seenCount = {};
-  enemies.forEach(e=>{ seenCount[e.name] = (seenCount[e.name]||0)+1; });
-  const seenSoFar = {};
-  enemies.forEach(e=>{
-    if (seenCount[e.name] > 1){
-      seenSoFar[e.name] = (seenSoFar[e.name]||0)+1;
-      e.name = e.name + " #" + seenSoFar[e.name];
-    }
-  });
-  return enemies;
-}
-function reassignEnemiesToMap(map){
-  const nonStartRooms = map.rooms.filter(r=>!r.isStart);
-  if (!nonStartRooms.length) return;
-  state.enemies.forEach(e=>{
-    const room = nonStartRooms[Math.floor(Math.random()*nonStartRooms.length)];
-    e.roomId = room.id; e.roomName = room.name;
-  });
-}
+                /* ============================================================
+                   RENDER: GAME TYPE SELECTOR
+                ============================================================ */
+                function renderGameTypeRow() {
+                    const row = document.getElementById("gametypeRow");
+                    row.innerHTML = "";
+                    Object.keys(GAME_TYPES).forEach(key => {
+                        const t = GAME_TYPES[key];
+                        const card = document.createElement("div");
+                        card.className = "gametype-card" + (state.gameType === key ? " selected" : "");
+                        card.innerHTML = `<div class="gt-icon">${t.icon}</div><div class="gt-name">${t.name}</div><div class="gt-desc">${t.desc}</div>`;
+                        card.addEventListener("click", () => {
+                            state.gameType = key;
+                            renderGameTypeRow();
+                        });
+                        row.appendChild(card);
+                    });
+                }
 
-/* ============================================================
-   RENDER: GAME TYPE SELECTOR
-============================================================ */
-function renderGameTypeRow(){
-  const row = document.getElementById("gametypeRow");
-  row.innerHTML = "";
-  Object.keys(GAME_TYPES).forEach(key=>{
-    const t = GAME_TYPES[key];
-    const card = document.createElement("div");
-    card.className = "gametype-card"+(state.gameType===key?" selected":"");
-    card.innerHTML = `<div class="gt-icon">${t.icon}</div><div class="gt-name">${t.name}</div><div class="gt-desc">${t.desc}</div>`;
-    card.addEventListener("click", ()=>{
-      state.gameType = key;
-      renderGameTypeRow();
-    });
-    row.appendChild(card);
-  });
-}
+                /* ============================================================
+                   RENDER: BRIEFING
+                ============================================================ */
+                function fieldLabel(f) {
+                    return f.charAt(0).toUpperCase() + f.slice(1);
+                }
 
-/* ============================================================
-   RENDER: BRIEFING
-============================================================ */
-function fieldLabel(f){
-  return f.charAt(0).toUpperCase()+f.slice(1);
-}
-function renderBriefing(){
-  const empty = document.getElementById("briefingEmpty");
-  const content = document.getElementById("briefingContent");
-  if (!state.scenario){
-    empty.style.display="block"; content.style.display="none";
-    return;
-  }
-  empty.style.display="none"; content.style.display="block";
-  const type = GAME_TYPES[state.gameType];
-  const s = state.scenario;
+                function renderBriefing() {
+                    const empty = document.getElementById("briefingEmpty");
+                    const content = document.getElementById("briefingContent");
+                    if (!state.scenario) {
+                        empty.style.display = "block";
+                        content.style.display = "none";
+                        return;
+                    }
+                    empty.style.display = "none";
+                    content.style.display = "block";
+                    const type = GAME_TYPES[state.gameType];
+                    const s = state.scenario;
 
-  let fieldsHtml = type.fields.map(f=>{
-    return `<div class="brief-field"><div class="label">${fieldLabel(f)}</div><div class="value" contenteditable="true" spellcheck="false" data-field="${f}">${s.fields[f]}</div></div>`;
-  }).join("");
+                    let fieldsHtml = type.fields.map(f => {
+                        return `<div class="brief-field"><div class="label">${fieldLabel(f)}</div><div class="value" contenteditable="true" spellcheck="false" data-field="${f}">${s.fields[f]}</div></div>`;
+                    }).join("");
 
-  const pct = Math.round((s.meter/s.meterMax)*100);
+                    const pct = Math.round((s.meter / s.meterMax) * 100);
 
-  content.innerHTML = `
+                    content.innerHTML = `
     <div class="briefing-head">
       <div>
         <div class="briefing-sub">${type.icon} ${type.name.toUpperCase()}</div>
@@ -812,108 +1948,188 @@ function roomIcon(r){
   if (r.event) return "⚡";
   return "▢";
 }
+function getRoomItems(roomId){
+  return state.loot.filter(l=>l.roomId===roomId && !l.collected && !l.ownerId);
+}
+function getRoomPlayers(roomId){
+  return state.players.filter(p=>p.locationId===roomId);
+}
+function selectRoom(id){
+  if (!state.map) return;
+  const r=state.map.rooms.find(x=>x.id===id);
+  if (!r) return;
+  if (!state.hostView && !r.revealed) return;
+  state.selectedRoomId=id;
+  renderMap();
+}
+function renderRoomInspector(){
+  const panel=document.getElementById("roomInspectorPanel");
+  const content=document.getElementById("roomInspectorContent");
+  const label=document.getElementById("selectedRoomLabel");
+  if (!state.map || !state.selectedRoomId){ panel.style.display="none"; return; }
+  const r=state.map.rooms.find(x=>x.id===state.selectedRoomId);
+  if (!r){ panel.style.display="none"; return; }
+  panel.style.display="block";
+  label.textContent=r.name;
+
+  const items=getRoomItems(r.id);
+  const occupants=getRoomPlayers(r.id);
+  const enemies=state.enemies.filter(e=>e.roomId===r.id && e.hp>0);
+  const publicEvent = state.hostView ? (r.event||"None") : (r.revealed ? (r.event||"None") : "Unknown");
+  const secret = state.hostView ? (r.hasSecret ? "Yes" : "No") : "Hidden";
+  const lootText = state.hostView ? (items.map(i=>`${i.name}${i.quantity>1?` ×${i.quantity}`:""}`).join(", ")||"None") : (r.revealed ? (items.length?"Something useful":"None") : "Unknown");
+  const connected = r.connections.map(id=>state.map.rooms.find(x=>x.id===id)).filter(Boolean);
+  const doors = connected.map(n=>`<span class="door-chip">${n.locked?"🔒":"🔓"} ${n.name}</span>`).join("");
+  const playerCanSee = state.hostView || r.revealed;
+
+  content.innerHTML=`
+    <div class="room-inspector">
+      <div class="room-type">${r.isStart?'START':r.isObjective?'OBJECTIVE':'ROOM'}${r.locked?' · 🔒 LOCKED':''}</div>
+      <h4>${r.name}</h4>
+      <div class="room-detail"><b>Players here:</b> ${occupants.map(p=>p.name).join(", ")||"Nobody"}</div>
+      ${state.hostView ? `<div class="room-detail"><b>Enemies:</b> ${enemies.map(e=>e.name).join(", ")||"None"}</div>` : ""}
+      <div class="room-detail"><b>Items:</b> ${lootText}</div>
+      <div class="room-detail"><b>Event:</b> ${publicEvent}</div>
+      <div class="room-detail"><b>Secret:</b> ${secret}</div>
+      <div class="room-detail"><b>Connected rooms:</b> ${doors||"None"}</div>
+      ${state.hostView ? `<div class="room-detail"><b>GM note:</b> ${r.note||"None"}</div>` : ""}
+      <div class="room-actions">
+        ${state.hostView && !r.revealed ? `<button class="primary" id="inspectRevealBtn">🗺️ Reveal Room</button>` : ""}
+        ${state.hostView ? `<button id="inspectRevealLinksBtn">👁️ Reveal Connected</button>` : ""}
+        ${state.hostView ? `<button id="inspectLockBtn">${r.locked?'🔓 Unlock Door':'🔒 Lock Door'}</button>` : ""}
+        ${state.hostView && r.event ? `<button id="inspectEventBtn">⚡ Trigger Event</button>` : ""}
+        ${state.hostView && items.length ? `<button id="inspectLootBtn">🎁 Collect Room Loot</button>` : ""}
+        ${!state.hostView && playerCanSee ? `<button id="inspectInteractBtn">🖐️ Interact / Investigate</button>` : ""}
+        <button id="closeRoomInspectorBtn" class="ghost">✕ Close</button>
+      </div>
+      ${state.hostView ? `<div class="map-tools-grid"><div class="map-stat"><div class="label">Move Player Here</div><div class="value"><select id="movePlayerSelect"><option value="">Choose player...</option>${state.players.map(p=>`<option value="${p.id}">${p.name}</option>`).join("")}</select></div></div><div class="map-stat"><div class="label">Move Enemy Here</div><div class="value"><select id="moveEnemySelect"><option value="">Choose enemy...</option>${state.enemies.map(e=>`<option value="${e.id}">${e.name}</option>`).join("")}</select></div></div></div>` : ""}
+    </div>`;
+
+  const reveal=document.getElementById("inspectRevealBtn");
+  if(reveal) reveal.onclick=()=>{r.revealed=true; addLog(`Host revealed room: ${r.name}`,"🗺️"); renderMap();};
+  const revealLinks=document.getElementById("inspectRevealLinksBtn");
+  if(revealLinks) revealLinks.onclick=()=>{
+    r.revealed=true;
+    r.connections.forEach(id=>{const n=state.map.rooms.find(x=>x.id===id); if(n) n.revealed=true;});
+    addLog(`Host revealed ${r.name} and its connected rooms.`,"👁️");
+    renderMap();
+  };
+  const lock=document.getElementById("inspectLockBtn");
+  if(lock) lock.onclick=()=>{r.locked=!r.locked; addLog(`${r.name} door is now ${r.locked?'🔒 locked':'🔓 unlocked'}.`,"🔑"); renderMap();};
+  const eventBtn=document.getElementById("inspectEventBtn");
+  if(eventBtn) eventBtn.onclick=()=>{addLog(`Triggered event in ${r.name}: ${r.event}`,"⚡"); r.eventTriggered=true; if(state.scenario) state.scenario.meter=Math.min(state.scenario.meterMax,(state.scenario.meter||0)+1); renderMap(); renderBriefing();};
+  const lootBtn=document.getElementById("inspectLootBtn");
+  if(lootBtn) lootBtn.onclick=()=>{items.forEach(i=>i.collected=true); addLog(`Collected room loot in ${r.name}.`,"🎁"); renderMap(); renderLoot(); renderInventory();};
+  const interact=document.getElementById("inspectInteractBtn");
+  if(interact) interact.onclick=()=>{addLog(`Players investigated ${r.name}.`,"🔎"); interact.textContent="✓ Action Logged"; interact.disabled=true;};
+  const moveP=document.getElementById("movePlayerSelect");
+  if(moveP) moveP.onchange=()=>{const p=state.players.find(x=>x.id===moveP.value); if(p){p.locationId=r.id; r.revealed=true; addLog(`${p.name} moved to ${r.name}.`,"📍"); renderMap(); renderPlayers();}};
+  const moveE=document.getElementById("moveEnemySelect");
+  if(moveE) moveE.onchange=()=>{const e=state.enemies.find(x=>x.id===moveE.value); if(e){e.roomId=r.id; e.roomName=r.name; addLog(`${e.name} moved to ${r.name}.`,"📍"); renderMap(); renderEnemies();}};
+  const close=document.getElementById("closeRoomInspectorBtn");
+  if(close) close.onclick=()=>{state.selectedRoomId=null; renderMap();};
+}
 function renderMap(){
   renderFloorTabs();
   const wrap = document.getElementById("mapContent");
   const countEl = document.getElementById("mapRoomCount");
+  const toolbar = document.getElementById("mapToolbar");
   if (!state.map){
     wrap.innerHTML = `<div class="empty-state"><span class="big">🗺️</span>No map generated yet.</div>`;
     countEl.textContent = "";
+    if(toolbar) toolbar.style.display="none";
+    renderRoomInspector();
     return;
   }
+  if(toolbar) toolbar.style.display="flex";
+  const revealNearbyBtn=document.getElementById("revealNearbyBtn");
+  const revealAllBtn=document.getElementById("revealAllBtn");
+  if(revealNearbyBtn) revealNearbyBtn.style.display=state.hostView?"inline-block":"none";
+  if(revealAllBtn) revealAllBtn.style.display=state.hostView?"inline-block":"none";
+  state.mapZoom = Math.max(.75, Math.min(1.6, state.mapZoom || 1));
   const m = state.map;
   countEl.textContent = m.roomCount + " rooms";
-
-  const byId = {};
-  m.rooms.forEach(r=>byId[r.id]=r);
-
-  let edgesSvg = "";
-  const drawn = new Set();
-  m.rooms.forEach(a=>{
-    a.connections.forEach(bid=>{
-      const key = [a.id,bid].sort().join("-");
-      if (drawn.has(key)) return;
-      drawn.add(key);
-      const b = byId[bid];
-      const locked = a.locked || b.locked;
-      const dashed = locked;
-      const bothFogged = !state.hostView && !a.revealed && !b.revealed;
-      const stroke = bothFogged ? "#2a2f37" : (locked ? "var(--red-dim)" : "#3a4049");
-      edgesSvg += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${stroke}" stroke-width="2" ${dashed?'stroke-dasharray="5,4"':''}/>`;
-      if (locked){
-        const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
-        edgesSvg += `<text x="${mx}" y="${my+4}" text-anchor="middle" font-size="13" fill="var(--red)">🔒</text>`;
-      }
-    });
-  });
-
-  let nodesSvg = "";
+  const byId = {}; m.rooms.forEach(r=>byId[r.id]=r);
+  let edgesSvg=""; const drawn=new Set();
+  m.rooms.forEach(a=>a.connections.forEach(bid=>{
+    const key=[a.id,bid].sort().join("-"); if(drawn.has(key)) return; drawn.add(key);
+    const b=byId[bid]; const locked=a.locked||b.locked; const bothFogged=!state.hostView&&!a.revealed&&!b.revealed;
+    const stroke=bothFogged?"#2a2f37":(locked?"var(--red-dim)":"#3a4049");
+    edgesSvg+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${stroke}" stroke-width="2.5" ${locked?'stroke-dasharray="7,5"':''}/>`;
+    if(locked){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;edgesSvg+=`<text x="${mx}" y="${my+4}" text-anchor="middle" font-size="13" fill="var(--red)">🔒</text>`;}
+  }));
+  let nodesSvg="";
   m.rooms.forEach(r=>{
-    const fogged = !state.hostView && !r.revealed;
-    const bw=m.boxW, bh=m.boxH;
-    const x=r.x-bw/2, y=r.y-bh/2;
-    const fill = fogged ? "#181b20" : roomFillColor(r);
-    const stroke = fogged ? "#31363e" : roomStroke(r);
-    const strokeW = (r.isStart||r.isObjective) && !fogged ? 2 : 1.3;
-    const secretRing = (state.hostView && r.hasSecret) ? `<rect x="${x-4}" y="${y-4}" width="${bw+8}" height="${bh+8}" rx="10" fill="none" stroke="var(--red)" stroke-width="1.4" stroke-dasharray="4,3" opacity="0.8"/>` : "";
-
-    let label, sub;
-    if (fogged){
-      label = "???"; sub = "unexplored";
-    } else {
-      label = r.name;
-      const bits=[];
-      if (r.loot && state.hostView) bits.push("loot: "+r.loot);
-      if (r.event && state.hostView) bits.push("event: "+r.event);
-      if (r.hasSecret && state.hostView) bits.push("⚑ secret");
-      if (r.note && state.hostView) bits.push("📝 "+r.note.slice(0,28)+(r.note.length>28?"…":""));
-      if (state.hostView){
-        const here = state.enemies.filter(e=>e.roomId===r.id && e.hp>0);
-        if (here.length) bits.push(`⚔ ${here.length}`);
-      }
-      if (!state.hostView){
-        if (r.loot) bits.push("something here");
-        if (r.note && r.revealed) bits.push(r.note.slice(0,28)+(r.note.length>28?"…":""));
-      }
-      sub = bits.join(" · ") || (r.isStart?"start":r.isObjective?"objective":"");
+    const fogged=!state.hostView&&!r.revealed; const bw=m.boxW,bh=m.boxH,x=r.x-bw/2,y=r.y-bh/2;
+    const fill=fogged?"#181b20":roomFillColor(r), stroke=fogged?"#31363e":roomStroke(r);
+    const selected=state.selectedRoomId===r.id; const playersHere=getRoomPlayers(r.id); const roomItems=getRoomItems(r.id);
+    const secretRing=(state.hostView&&r.hasSecret)?`<rect x="${x-5}" y="${y-5}" width="${bw+10}" height="${bh+10}" rx="11" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="5,3"/>`:"";
+    let label="???",sub="unexplored";
+    if(!fogged){
+      label=r.name; const bits=[];
+      if(r.loot) bits.push(state.hostView?(roomItems.length?`🎁 ${roomItems.length}`:"🎁"):"🎁");
+      if(r.event) bits.push("⚡"); if(r.hasSecret&&state.hostView) bits.push("⚑");
+      if(r.note&&state.hostView) bits.push("📝"); if(state.hostView){const here=state.enemies.filter(e=>e.roomId===r.id&&e.hp>0);if(here.length)bits.push(`⚔ ${here.length}`);}
+      if(!state.hostView&&r.revealed&&r.eventTriggered) bits.push("event seen");
+      sub=bits.join(" · ") || (r.isStart?"start":r.isObjective?"objective":"");
     }
-
-    nodesSvg += `
-      <g class="room-node${fogged?' fogged':''}" data-id="${r.id}" tabindex="0" role="button" aria-label="${fogged?'Unexplored room':r.name}">
-        ${secretRing}
-        <rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="9" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}"/>
-        <text x="${r.x}" y="${r.y-6}" text-anchor="middle" font-size="12" fill="${fogged?'var(--text-faint)':'var(--text)'}" font-weight="600">${fogged?'':roomIcon(r)+' '}${label}</text>
-        <text x="${r.x}" y="${r.y+12}" text-anchor="middle" font-size="9.5" fill="${fogged?'var(--text-faint)':'var(--text-dim)'}">${sub}</text>
-      </g>`;
-  });
-
-  wrap.innerHTML = `
-    <div class="map-wrap">
-      <div class="map-corner tl"></div><div class="map-corner tr"></div>
-      <div class="map-corner bl"></div><div class="map-corner br"></div>
-      <svg viewBox="0 0 ${m.width} ${m.height}" xmlns="http://www.w3.org/2000/svg">
-        ${edgesSvg}
-        ${nodesSvg}
-      </svg>
-    </div>
-    <div class="map-hint">${state.hostView ? 'Click a room to reveal it to players.' : 'Rooms marked ??? have not been explored yet.'}</div>
-  `;
-
-  if (state.hostView){
-    wrap.querySelectorAll(".room-node").forEach(node=>{
-      node.addEventListener("click", ()=>{
-        const id = node.getAttribute("data-id");
-        const r = byId[id];
-        if (!r.revealed){
-          r.revealed = true;
-          addLog(`Host revealed room: ${r.name}`, "🗺️");
-          renderMap();
-        }
+    nodesSvg+=`<g class="room-node${fogged?' fogged':''}" data-id="${r.id}" tabindex="0" role="button" aria-label="${fogged?'Unexplored room':r.name}">
+      ${secretRing}${selected&&!fogged?`<rect x="${x-3}" y="${y-3}" width="${bw+6}" height="${bh+6}" rx="10" fill="none" stroke="var(--teal)" stroke-width="2"/>`:""}
+      <rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="10" fill="${fill}" stroke="${stroke}" stroke-width="${selected&&!fogged?2:1.5}"/>
+      <text x="${r.x}" y="${r.y-7}" text-anchor="middle" font-size="13" fill="${fogged?'var(--text-faint)':'var(--text)'}" font-weight="600">${fogged?'':roomIcon(r)+' '}${label}</text>
+      <text x="${r.x}" y="${r.y+13}" text-anchor="middle" font-size="9.5" fill="${fogged?'var(--text-faint)':'var(--text-dim)'}">${sub}</text>
+    </g>`;
+    if(!fogged && playersHere.length){
+      const maxMarkers=Math.min(playersHere.length,6);
+      const startX=r.x-(maxMarkers-1)*15;
+      playersHere.slice(0,maxMarkers).forEach((pl,idx)=>{
+        const px=startX+idx*30, py=y+bh-1, col=pl.color||"#2dd4bf", icon=pl.icon||"👤";
+        nodesSvg+=`<g class="player-marker" data-player-marker="${pl.id}" tabindex="0" role="button"><title>${pl.name} · ${r.name}</title><circle cx="${px}" cy="${py}" r="12" fill="${col}" stroke="#0b0e11" stroke-width="2"/><text class="marker-icon" x="${px}" y="${py+5}" text-anchor="middle" font-size="12">${icon}</text></g>`;
       });
+      if(playersHere.length>maxMarkers){ nodesSvg+=`<text x="${r.x+78}" y="${y+bh+4}" font-size="9" fill="var(--text-dim)">+${playersHere.length-maxMarkers}</text>`; }
+    }
+  });
+  const legendPlayers=state.players.map(p=>`<span class="player-legend-item" data-player-marker="${p.id}"><span class="player-legend-dot" style="background:${p.color||'#2dd4bf'}">${p.icon||'👤'}</span>${p.name}</span>`).join("");
+  const viewBanner=state.hostView
+  ? `<div class="map-view-banner"><strong>👑 GM VIEW</strong> — all rooms and secrets are visible. Use <b>Reveal Connected</b> to control what players discover.</div>`
+  : `<div class="map-view-banner"><strong>🧑 PLAYER VIEW</strong> — unexplored rooms are hidden. Only revealed rooms, public information, and your visible map markers are shown.</div>`;
+wrap.innerHTML=`${viewBanner}<div class="map-viewport" id="mapViewport"><svg id="opsMapSvg" viewBox="0 0 ${m.width} ${m.height}" xmlns="http://www.w3.org/2000/svg" style="transform:scale(${state.mapZoom});transform-origin:top left;">${edgesSvg}${nodesSvg}</svg></div><div class="player-legend">${legendPlayers||'<span class="map-hint">Add players to see their markers here.</span>'}</div><div class="map-hint">${state.hostView?'Click rooms to manage them. Click a player marker to customize it.':'Only revealed rooms can be inspected. Ask the GM to reveal new areas.'}</div>`;
+  wrap.querySelectorAll(".room-node").forEach(node=>node.addEventListener("click",()=>selectRoom(node.getAttribute("data-id"))));
+  wrap.querySelectorAll("[data-player-marker]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();openPlayerCustomize(el.getAttribute("data-player-marker"));}));
+  const nearbyBtn=document.getElementById("revealNearbyBtn");
+  if(nearbyBtn) nearbyBtn.onclick=()=>{
+    const currentRooms=[...new Set(state.players.map(p=>p.locationId).filter(Boolean))];
+    let count=0;
+    currentRooms.forEach(rid=>{
+      const rr=m.rooms.find(x=>x.id===rid);
+      if(!rr) return;
+      rr.revealed=true;
+      rr.connections.forEach(cid=>{const n=m.rooms.find(x=>x.id===cid); if(n&&!n.revealed){n.revealed=true;count++;}});
     });
-  }
+    addLog(`Revealed ${count} room${count===1?"":"s"} around player locations.`,"👁️");
+    renderMap();
+  };
+  const allBtn=document.getElementById("revealAllBtn");
+  if(allBtn) allBtn.onclick=()=>{
+    m.rooms.forEach(r=>r.revealed=true);
+    addLog("Host revealed the entire current floor to players.","🗺️");
+    renderMap();
+  };
+  renderRoomInspector(); renderRoomNotesPanel();
+}
 
-  renderRoomNotesPanel();
+function openPlayerCustomize(playerId){
+  const p=state.players.find(x=>x.id===playerId); if(!p) return;
+  p.icon=p.icon||"👤"; p.color=p.color||"#2dd4bf";
+  const panel=document.getElementById("playerCustomizePanel"), content=document.getElementById("playerCustomizeContent");
+  panel.style.display="block";
+  content.innerHTML=`<div class="player-customize"><div class="icon-preview" id="markerPreview" style="background:${p.color}">${p.icon}</div><div class="customize-grid"><div><label>Player</label><input value="${p.name.replace(/"/g,'&quot;')}" disabled></div><div><label>Map Icon</label><input id="markerIconInput" maxlength="4" value="${p.icon.replace(/"/g,'&quot;')}" placeholder="👤"></div><div><label>Marker Color</label><input id="markerColorInput" type="color" value="${p.color}"></div></div><div class="room-actions"><button id="saveMarkerBtn" class="primary">Save Marker</button><button id="resetMarkerBtn">Reset</button></div></div>`;
+  const update=()=>{const icon=document.getElementById("markerIconInput").value.trim()||"👤", color=document.getElementById("markerColorInput").value; const prev=document.getElementById("markerPreview"); prev.textContent=icon; prev.style.background=color;};
+  document.getElementById("markerIconInput").addEventListener("input",update); document.getElementById("markerColorInput").addEventListener("input",update);
+  document.getElementById("saveMarkerBtn").onclick=()=>{p.icon=document.getElementById("markerIconInput").value.trim()||"👤";p.color=document.getElementById("markerColorInput").value||"#2dd4bf";addLog(`${p.name}'s map marker was customized.`,'🎨');renderPlayers();renderMap();panel.style.display="none";};
+  document.getElementById("resetMarkerBtn").onclick=()=>{p.icon="👤";p.color="#2dd4bf";renderPlayers();renderMap();panel.style.display="none";};
+  document.getElementById("closePlayerCustomizeBtn").onclick=()=>{panel.style.display="none";};
+  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 
 function renderRoomNotesPanel(){
@@ -925,6 +2141,7 @@ function renderRoomNotesPanel(){
   select.innerHTML = state.map.rooms.map(r=>`<option value="${r.id}">${r.name}${r.isStart?' (start)':''}${r.isObjective?' (objective)':''}</option>`).join("");
   if (prevVal && state.map.rooms.some(r=>r.id===prevVal)) select.value = prevVal;
   const activeId = select.value;
+  state.selectedRoomId = activeId || state.selectedRoomId;
   const active = state.map.rooms.find(r=>r.id===activeId);
   document.getElementById("roomNoteArea").value = (active && active.note) || "";
 }
@@ -933,73 +2150,62 @@ function renderRoomNotesPanel(){
    PLAYERS
 ============================================================ */
 function renderPlayers(){
-  const list = document.getElementById("playerList");
-  document.getElementById("playerCount").textContent = state.players.length;
-  if (!state.players.length){
-    list.innerHTML = `<div class="empty-state" style="padding:16px 4px;">No players added yet.</div>`;
-    return;
-  }
-  list.innerHTML = state.players.map(p=>`
-    <li class="player-row" data-pid="${p.id}">
-      <span class="dot"></span>
-      <span class="pname">${p.name}</span>
-      <span class="tag-row">
-        ${(p.tags||[]).map(t=>`<span class="status-chip" data-remove-tag="${t}">${t} ✕</span>`).join("")}
-        <button class="add-tag-btn" data-add-tag-for="${p.id}">+ tag</button>
-      </span>
-      <button data-id="${p.id}" class="removePlayerBtn danger ghost">✕</button>
-    </li>`).join("");
-  list.querySelectorAll(".removePlayerBtn").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const id = btn.getAttribute("data-id");
-      const p = state.players.find(pp=>pp.id===id);
-      state.players = state.players.filter(pp=>pp.id!==id);
-      state.turnOrder = state.turnOrder.filter(pp=>!(pp.id===id && pp.type==="player"));
-      if (p) addLog(`${p.name} left the table.`, "👤");
-      renderAll();
-    });
-  });
-  list.querySelectorAll("[data-remove-tag]").forEach(chip=>{
-    chip.addEventListener("click", ()=>{
-      const row = chip.closest(".player-row");
-      const pid = row.getAttribute("data-pid");
-      const p = state.players.find(pp=>pp.id===pid);
-      const tag = chip.getAttribute("data-remove-tag");
-      p.tags = (p.tags||[]).filter(t=>t!==tag);
-      addLog(`Removed "${tag}" from ${p.name}.`, "🏷️");
-      renderPlayers(); renderTurnOrder();
-    });
-  });
-  list.querySelectorAll("[data-add-tag-for]").forEach(btn=>{
-    btn.addEventListener("click", (e)=>{
-      e.stopPropagation();
-      closeTagPicker();
-      const pid = btn.getAttribute("data-add-tag-for");
-      const p = state.players.find(pp=>pp.id===pid);
-      const picker = document.createElement("div");
-      picker.className = "tag-picker";
-      picker.id = "activeTagPicker";
-      const available = STATUS_TAGS.filter(t=>!(p.tags||[]).includes(t));
-      picker.innerHTML = available.map(t=>`<button data-tag="${t}">${t}</button>`).join("") || `<span style="font-size:11px;color:var(--text-faint);padding:4px 8px;">All tags applied</span>`;
-      btn.parentElement.appendChild(picker);
-      picker.querySelectorAll("button[data-tag]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          p.tags = p.tags || [];
-          p.tags.push(b.getAttribute("data-tag"));
-          addLog(`${p.name} is now ${b.getAttribute("data-tag")}.`, "🏷️");
-          closeTagPicker();
-          renderPlayers(); renderTurnOrder();
-        });
-      });
-      setTimeout(()=>document.addEventListener("click", closeTagPicker, {once:true}),0);
-    });
-  });
+  const list=document.getElementById("playerList");
+  document.getElementById("playerCount").textContent=state.players.length;
+  if(!state.players.length){list.innerHTML=`<div class="empty-state" style="padding:16px 4px;">No players added yet.</div>`;return;}
+  list.innerHTML=state.players.map(p=>{
+    const hp=p.hp??10,maxHp=p.maxHp??10, loc=state.map?.rooms.find(r=>r.id===p.locationId);
+    const inv=state.loot.filter(l=>l.ownerId===p.id).length;
+    return `<li class="player-row" data-pid="${p.id}">
+      <button class="player-marker-mini" data-customize-player="${p.id}" title="Customize map marker" style="width:28px;height:28px;border-radius:50%;border:2px solid ${p.color||"#2dd4bf"};background:${p.color||"#2dd4bf"};color:#101515;padding:0;font-size:15px;cursor:pointer;">${p.icon||"👤"}</button><span class="pname">${p.name}${p.cls?` <span style="color:var(--text-faint);font-weight:400;">— ${p.cls}</span>`:''}<br><span class="player-location">❤️ ${hp}/${maxHp} HP${loc?' · 📍 '+loc.name:''} · 🎒 '+inv+'</span></span>
+      <span class="tag-row">${(p.tags||[]).map(t=>`<span class="status-chip" data-remove-tag="${t}">${t} ✕</span>`).join("")}<button class="add-tag-btn" data-add-tag-for="${p.id}">+ tag</button></span>
+      <button data-id="${p.id}" class="inventoryPlayerBtn">🎒</button><button data-id="${p.id}" class="removePlayerBtn danger ghost">✕</button>
+    </li>`;
+  }).join("");
+  list.querySelectorAll("[data-customize-player]").forEach(btn=>btn.addEventListener("click",e=>{e.stopPropagation();openPlayerCustomize(btn.getAttribute("data-customize-player"));}));
+  list.querySelectorAll(".inventoryPlayerBtn").forEach(btn=>btn.addEventListener("click",()=>{state.inventoryFilter=btn.getAttribute("data-id");renderLoot();document.getElementById("inventoryPanel").scrollIntoView({behavior:"smooth",block:"start"});}));
+  list.querySelectorAll(".removePlayerBtn").forEach(btn=>btn.addEventListener("click",()=>{const id=btn.getAttribute("data-id"),p=state.players.find(pp=>pp.id===id);state.players=state.players.filter(pp=>pp.id!==id);state.loot.forEach(l=>{if(l.ownerId===id)l.ownerId=null;});state.turnOrder=state.turnOrder.filter(pp=>!(pp.id===id&&pp.type==="player"));if(p)addLog(`${p.name} left the table.`, "👤");renderAll();}));
+  list.querySelectorAll("[data-remove-tag]").forEach(chip=>chip.addEventListener("click",()=>{const row=chip.closest(".player-row"),pid=row.getAttribute("data-pid"),p=state.players.find(pp=>pp.id===pid),tag=chip.getAttribute("data-remove-tag");p.tags=(p.tags||[]).filter(t=>t!==tag);addLog(`Removed "${tag}" from ${p.name}.`,"🏷️");renderPlayers();renderTurnOrder();}));
+  list.querySelectorAll("[data-add-tag-for]").forEach(btn=>btn.addEventListener("click",e=>{e.stopPropagation();closeTagPicker();const pid=btn.getAttribute("data-add-tag-for"),p=state.players.find(pp=>pp.id===pid),picker=document.createElement("div");picker.className="tag-picker";picker.id="activeTagPicker";const available=STATUS_TAGS.filter(t=>!(p.tags||[]).includes(t));picker.innerHTML=available.map(t=>`<button data-tag="${t}">${t}</button>`).join("")||`<span style="font-size:11px;color:var(--text-faint);padding:4px 8px;">All tags applied</span>`;btn.parentElement.appendChild(picker);picker.querySelectorAll("button[data-tag]").forEach(b=>b.addEventListener("click",()=>{p.tags=p.tags||[];p.tags.push(b.getAttribute("data-tag"));addLog(`${p.name} is now ${b.getAttribute("data-tag")}.`,"🏷️");closeTagPicker();renderPlayers();renderTurnOrder();}));setTimeout(()=>document.addEventListener("click",closeTagPicker,{once:true}),0);}));
 }
 function closeTagPicker(){
   const el = document.getElementById("activeTagPicker");
   if (el) el.remove();
 }
 
+function populateClassSelect(){
+  const sel = document.getElementById("playerClassInput");
+  if (sel.options.length) return;
+  sel.innerHTML = CLASS_LIST.map(c=>`<option value="${c}">${c}</option>`).join("");
+}
+
+function normalizeLootItem(l){
+  if(l.ownerId===undefined) l.ownerId=null;
+  if(l.roomId===undefined) l.roomId=null;
+  if(l.quantity===undefined) l.quantity=1;
+  return l;
+}
+function renderLoot(){
+  const panel=document.getElementById("lootPanel"),list=document.getElementById("lootList"),countEl=document.getElementById("lootCount"),filter=document.getElementById("inventoryOwnerFilter");
+  if(!state.scenario){panel.style.display="none";document.getElementById("inventoryPanel").style.display="none";return;}
+  state.loot.forEach(normalizeLootItem); panel.style.display="block";
+  const owners=[...state.players]; filter.innerHTML=`<option value="all">All Inventory</option><option value="unassigned">Unassigned / On Map</option>`+owners.map(p=>`<option value="${p.id}">${p.name}'s Inventory</option>`).join(""); filter.value=state.inventoryFilter||"all";
+  const visible=state.loot.filter(l=>state.inventoryFilter==="all"?true:state.inventoryFilter==="unassigned"?!l.ownerId:l.ownerId===state.inventoryFilter);
+  const collectedN=state.loot.filter(l=>l.collected||l.ownerId).length; countEl.textContent=`${collectedN}/${state.loot.length}`;
+  if(!visible.length){list.innerHTML=`<div class="empty-state" style="padding:16px 4px;">No items in this view.</div>`;renderInventory();return;}
+  list.innerHTML=visible.map(l=>{const owner=state.players.find(p=>p.id===l.ownerId),room=state.map?.rooms.find(r=>r.id===l.roomId);return `<li class="loot-row${l.collected?' collected':''}" data-id="${l.id}"><input type="checkbox" class="lootCheck" ${l.collected?'checked':''}><span class="lname">🎒 ${l.name}${l.quantity>1?' ×'+l.quantity:''}</span><span class="lsource">${owner?owner.name:(room?room.name:(l.source||''))}</span><select class="lootOwner" style="width:110px;"><option value="">${owner?'Move...':'Give to...'}</option>${state.players.map(p=>`<option value="${p.id}">${p.name}</option>`).join("")}</select><button data-id="${l.id}" class="removeLootBtn danger ghost">✕</button></li>`;}).join("");
+  list.querySelectorAll(".lootCheck").forEach(cb=>cb.addEventListener("change",()=>{const item=state.loot.find(l=>l.id===cb.closest(".loot-row").getAttribute("data-id"));item.collected=cb.checked;if(cb.checked)item.ownerId=null;addLog(`${cb.checked?'Collected':'Un-collected'}: ${item.name}.`,cb.checked?"🎁":"↩️");renderLoot();renderInventory();renderMap();}));
+  list.querySelectorAll(".lootOwner").forEach(sel=>sel.addEventListener("change",()=>{const item=state.loot.find(l=>l.id===sel.closest(".loot-row").getAttribute("data-id"));if(sel.value){item.ownerId=sel.value;item.collected=true;const p=state.players.find(x=>x.id===sel.value);addLog(`${item.name} added to ${p?.name||'player'}'s inventory.`,"🎒");}renderLoot();renderInventory();renderMap();}));
+  list.querySelectorAll(".removeLootBtn").forEach(btn=>btn.addEventListener("click",()=>{const id=btn.getAttribute("data-id"),item=state.loot.find(l=>l.id===id);state.loot=state.loot.filter(l=>l.id!==id);if(item)addLog(`Removed item: ${item.name}.`,"🗑");renderLoot();renderInventory();renderMap();}));
+  renderInventory();
+}
+function renderInventory(){
+  const panel=document.getElementById("inventoryPanel"),wrap=document.getElementById("inventoryList"),count=document.getElementById("inventoryCount");
+  if(!state.scenario||!state.players.length){panel.style.display="none";return;}
+  panel.style.display="block"; const owned=state.loot.filter(l=>l.ownerId); count.textContent=`${owned.length} items`;
+  wrap.innerHTML=state.players.map(p=>{const items=state.loot.filter(l=>l.ownerId===p.id);return `<div class="room-inspector" style="margin-top:0;margin-bottom:8px;"><div class="room-type">PLAYER INVENTORY</div><h4>${p.name}</h4><div class="room-detail">${items.length?items.map(i=>`<div class="inventory-row"><span class="iname">🎒 ${i.name}</span><span class="qty">×${i.quantity||1}</span><button class="dropItemBtn ghost" data-item="${i.id}">Drop</button></div>`).join(""):`<span style="color:var(--text-faint)">Inventory empty.</span>`}</div></div>`;}).join("");
+  wrap.querySelectorAll(".dropItemBtn").forEach(btn=>btn.addEventListener("click",()=>{const item=state.loot.find(l=>l.id===btn.getAttribute("data-item"));if(item){item.ownerId=null;item.collected=false;addLog(`${item.name} was dropped back into the mission.`,"🎒");renderLoot();renderInventory();renderMap();}}));
+}
 function renderEnemies(){
   const list = document.getElementById("enemyList");
   document.getElementById("enemyCount").textContent = state.enemies.length;
@@ -1010,9 +2216,9 @@ function renderEnemies(){
   list.innerHTML = state.enemies.map(e=>{
     const pct = Math.max(0, Math.min(100, Math.round((e.hp/e.maxHp)*100)));
     return `
-    <li class="enemy-row" data-eid="${e.id}">
+    <li class="enemy-row${e.isBoss?' boss-row':''}" data-eid="${e.id}">
       <div class="erow-top">
-        <span class="ename">${e.name}</span>
+        <span class="ename">${e.isBoss?'👑 ':''}${e.name}</span>
         <span class="ehp-text">${e.hp}/${e.maxHp} HP${e.roomName?' · 📍 '+e.roomName:''}</span>
         <button data-id="${e.id}" class="removeEnemyBtn danger ghost">✕</button>
       </div>
@@ -1076,7 +2282,7 @@ function renderTurnOrder(){
     return `
     <li class="player-row${i===state.currentTurnIdx?' current-turn':''}">
       <span class="dot" style="${isEnemy?'background:var(--red);':''}"></span>
-      <span class="pname">${isEnemy?'⚔ ':''}${ent.name}</span>
+      <span class="pname">${isEnemy?'⚔ ':''}${ent.name}${!isEnemy && ent.cls ? ` <span style="color:var(--text-faint);font-weight:400;">— ${ent.cls}</span>`:''}</span>
       ${tagsHtml}
       ${hpHtml}
       <span class="init">${t.init}</span>
@@ -1162,29 +2368,35 @@ function renderLog(){
 ============================================================ */
 function doGenerate(seedOverride){
   const seedInput = document.getElementById("seedInput");
-  const seed = seedOverride || seedInput.value.trim() || randSeedString();
+  const typedSeed = seedInput.value.trim();
+  // if the field still holds the seed we auto-filled last time, treat it as blank so Generate rolls fresh
+  const seed = seedOverride || (typedSeed && typedSeed !== state.lastAutoSeed ? typedSeed : randSeedString());
   seedInput.value = seed;
   state.seed = seed;
-  const rng = makeRng(seed+"::"+state.gameType);
+  state.lastAutoSeed = seed;
+  const rng = makeRng(seed+"::"+state.gameType+"::"+state.difficulty);
   state.scenario = generateScenario(state.gameType, rng);
   const firstMap = generateMap(state.gameType, rng);
   state.floors = [firstMap];
   state.currentFloorIdx = 0;
   state.map = firstMap;
+  state.selectedRoomId = firstMap.rooms[0]?.id || null;
+  state.players.forEach(p=>{ if(p.locationId==null) p.locationId=firstMap.rooms[0]?.id||null; });
   state.enemies = generateEnemies(state.gameType, rng, firstMap);
   state.turnOrder = [];
   state.currentTurnIdx = -1;
+  buildLootFromMap(firstMap, true);
   document.getElementById("seedDisplay").textContent = seed;
-  addLog(`New game generated — ${GAME_TYPES[state.gameType].name} (seed ${seed})`, "🎲");
+  addLog(`New game generated — ${GAME_TYPES[state.gameType].name}, ${DIFFICULTY[state.difficulty].label} (seed ${seed})`, "🎲");
   if (state.enemies.length){
-    addLog(`Encounter set: ${state.enemies.map(e=>`${e.name} (${e.roomName})`).join(", ")}.`, "⚔");
+    addLog(`Encounter set: ${state.enemies.map(e=>`${e.isBoss?'👑 ':''}${e.name} (${e.roomName})`).join(", ")}.`, "⚔");
   }
   renderAll();
 }
 function doRegenerateScenario(){
   if (!state.map){ doGenerate(); return; }
   const newSeed = randSeedString();
-  const rng = makeRng(newSeed+"::scenario::"+state.gameType);
+  const rng = makeRng(newSeed+"::scenario::"+state.gameType+"::"+state.difficulty);
   state.scenario = generateScenario(state.gameType, rng);
   state.seed = state.seed + "*";
   document.getElementById("seedDisplay").textContent = state.seed;
@@ -1194,32 +2406,38 @@ function doRegenerateScenario(){
 function doRegenerateMap(){
   if (!state.scenario){ doGenerate(); return; }
   const newSeed = randSeedString();
-  const rng = makeRng(newSeed+"::map::"+state.gameType);
+  const rng = makeRng(newSeed+"::map::"+state.gameType+"::"+state.difficulty);
   const newMap = generateMap(state.gameType, rng);
   state.floors[state.currentFloorIdx] = newMap;
   state.map = newMap;
+  state.selectedRoomId = newMap.rooms[0]?.id || null;
+  state.players.forEach(p=>{ if(!newMap.rooms.some(r=>r.id===p.locationId)) p.locationId=newMap.rooms[0]?.id||null; });
   if (state.currentFloorIdx === 0) reassignEnemiesToMap(newMap);
+  buildLootFromMap(newMap, true);
   state.seed = state.seed + "*";
   document.getElementById("seedDisplay").textContent = state.seed;
   addLog(`Floor ${state.currentFloorIdx+1} map regenerated (scenario kept).`, "🗺️");
-  renderMap(); renderEnemies();
+  renderMap(); renderEnemies(); renderLoot();
 }
 function addFloor(){
   if (!state.scenario){ addLog("Generate a game before adding floors.", "⚠️"); return; }
   const newSeed = randSeedString();
-  const rng = makeRng(newSeed+"::floor"+state.floors.length+"::"+state.gameType);
+  const rng = makeRng(newSeed+"::floor"+state.floors.length+"::"+state.gameType+"::"+state.difficulty);
   const newMap = generateMap(state.gameType, rng);
   const prevFloorNum = state.floors.length;
   state.floors.push(newMap);
   state.currentFloorIdx = state.floors.length-1;
   state.map = newMap;
+  state.selectedRoomId = newMap.rooms[0]?.id || null;
+  buildLootFromMap(newMap, false);
   addLog(`Floor ${prevFloorNum+1} added — stairs lead down from Floor ${prevFloorNum}'s ${state.floors[prevFloorNum-1].rooms[state.floors[prevFloorNum-1].rooms.length-1].name} to Floor ${prevFloorNum+1}'s ${newMap.rooms[0].name}.`, "🪜");
-  renderMap();
+  renderMap(); renderLoot();
 }
 function switchFloor(idx){
   if (idx<0 || idx>=state.floors.length) return;
   state.currentFloorIdx = idx;
   state.map = state.floors[idx];
+  state.selectedRoomId = state.map?.rooms[0]?.id || null;
   renderMap();
 }
 function renderFloorTabs(){
@@ -1243,6 +2461,8 @@ function renderAll(){
   renderEnemies();
   renderTurnOrder();
   renderRollRows();
+  renderLoot();
+  renderInventory();
   renderLog();
   document.getElementById("saveLoadPanel").style.display = state.scenario ? "block" : "none";
 }
@@ -1256,6 +2476,7 @@ function printBriefing(){
   const type = GAME_TYPES[state.gameType];
   const s = state.scenario;
   let html = `<h1>${type.icon} ${type.name}</h1>`;
+  html += `<div class="pf"><b>Difficulty:</b> ${DIFFICULTY[state.difficulty].label}</div>`;
   type.fields.forEach(f=>{
     html += `<div class="pf"><b>${fieldLabel(f)}:</b> ${s.fields[f]}</div>`;
   });
@@ -1283,7 +2504,24 @@ function printBriefing(){
   if (state.players.length){
     html += `<h2>Players</h2><ol>`;
     state.players.forEach(p=>{
-      html += `<li>${p.name}${p.tags&&p.tags.length?' — '+p.tags.join(", "):''}</li>`;
+      const bits=[];
+      if (p.cls) bits.push(p.cls);
+      if (p.tags && p.tags.length) bits.push(...p.tags);
+      html += `<li>${p.name}${bits.length?' — '+bits.join(", "):''}</li>`;
+    });
+    html += `</ol>`;
+  }
+  if (state.hostView && state.enemies.length){
+    html += `<h2>Encounter</h2><ol>`;
+    state.enemies.forEach(e=>{
+      html += `<li>${e.isBoss?'[BOSS] ':''}${e.name} — ${e.hp}/${e.maxHp} HP${e.roomName?' — '+e.roomName:''}</li>`;
+    });
+    html += `</ol>`;
+  }
+  if (state.loot.length){
+    html += `<h2>Loot</h2><ol>`;
+    state.loot.forEach(l=>{
+      html += `<li>${l.collected?'[collected] ':''}${l.name}${l.source?' — '+l.source:''}</li>`;
     });
     html += `</ol>`;
   }
@@ -1322,12 +2560,16 @@ document.getElementById("playerNameInput").addEventListener("keydown", e=>{
 });
 function addPlayerFromInput(){
   const input = document.getElementById("playerNameInput");
+  const clsSelect = document.getElementById("playerClassInput");
   const name = input.value.trim();
   if (!name) return;
-  const p = {id:uid(), name, tags:[]};
+  const cls = clsSelect.value || null;
+  const classHp = {Thief:18,Rogue:20,Hacker:16,Muscle:25,Priest:20,Cultist:18,Ghostlore:18,"Camera man":20,Scavenger:20,Medic:20,Builder:22,survivalist:24}[cls] || 20;
+  const startRoom = state.map?.rooms.find(r=>r.isStart);
+  const p = {id:uid(), name, tags:[], cls, hp:classHp, maxHp:classHp, locationId:startRoom?.id || null, icon:"👤", color:"#2dd4bf"};
   state.players.push(p);
   input.value="";
-  addLog(`${name} joined the table.`, "👤");
+  addLog(`${name} (${p.cls}) joined the table.`, "👤");
   renderPlayers();
   renderRollRowsSync();
 }
@@ -1349,6 +2591,85 @@ document.getElementById("rerollEnemiesBtn").addEventListener("click", ()=>{
   addLog(`Encounter rerolled: ${state.enemies.length ? state.enemies.map(e=>`${e.name} (${e.roomName})`).join(", ") : "no enemies"}.`, "⚔");
   renderEnemies(); renderTurnOrder();
 });
+
+/* ---- difficulty ---- */
+document.querySelectorAll(".diffBtn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    state.difficulty = btn.getAttribute("data-diff");
+    document.querySelectorAll(".diffBtn").forEach(b=>b.classList.toggle("active", b===btn));
+    addLog(`Difficulty set to ${DIFFICULTY[state.difficulty].label}. Applies on next Generate.`, "⚙️");
+  });
+});
+
+/* ---- host rules panel ---- */
+document.getElementById("rulesBtn").addEventListener("click", ()=>{
+  const panel = document.getElementById("rulesPanel");
+  panel.style.display = panel.style.display==="none" ? "block" : "none";
+  if (panel.style.display==="block") panel.scrollIntoView({behavior:"smooth", block:"start"});
+});
+document.getElementById("closeRulesBtn").addEventListener("click", ()=>{
+  document.getElementById("rulesPanel").style.display = "none";
+});
+
+/* ---- loot ---- */
+document.getElementById("inventoryOwnerFilter").addEventListener("change", e=>{state.inventoryFilter=e.target.value;renderLoot();});
+document.getElementById("clearInventoryFilterBtn").addEventListener("click", ()=>{state.inventoryFilter="all";renderLoot();});
+document.getElementById("addLootBtn").addEventListener("click", addLootFromInput);
+document.getElementById("lootNameInput").addEventListener("keydown", e=>{
+  if (e.key==="Enter") addLootFromInput();
+});
+function addLootFromInput(){
+  const nameInput = document.getElementById("lootNameInput");
+  const sourceInput = document.getElementById("lootSourceInput");
+  const name = nameInput.value.trim();
+  if (!name) return;
+  state.loot.push({id:uid(), name, source:sourceInput.value.trim(), collected:false, ownerId:null, roomId:null, quantity:1});
+  nameInput.value=""; sourceInput.value="";
+  addLog(`Added loot: ${name}.`, "🎁");
+  renderLoot();
+}
+
+/* ---- customize word lists ---- */
+function customCategoriesFor(typeKey){
+  const type = GAME_TYPES[typeKey];
+  return [...type.fields, "secret", "rooms", "loot", "events", "enemies", "boss"];
+}
+function loadCustomCategoryIntoTextarea(){
+  const typeKey = state.gameType;
+  const category = document.getElementById("customCategorySelect").value;
+  const current = getPool(typeKey, category);
+  document.getElementById("customListArea").value = current.join("\n");
+}
+document.getElementById("customizeBtn").addEventListener("click", ()=>{
+  const panel = document.getElementById("customizePanel");
+  document.getElementById("customizeGameTypeLabel").textContent = GAME_TYPES[state.gameType].name;
+  const catSelect = document.getElementById("customCategorySelect");
+  catSelect.innerHTML = customCategoriesFor(state.gameType).map(c=>`<option value="${c}">${fieldLabel(c)}</option>`).join("");
+  loadCustomCategoryIntoTextarea();
+  panel.style.display = "block";
+  panel.scrollIntoView({behavior:"smooth", block:"start"});
+});
+document.getElementById("closeCustomizeBtn").addEventListener("click", ()=>{
+  document.getElementById("customizePanel").style.display = "none";
+});
+document.getElementById("customCategorySelect").addEventListener("change", loadCustomCategoryIntoTextarea);
+document.getElementById("saveCustomListBtn").addEventListener("click", ()=>{
+  const typeKey = state.gameType;
+  const category = document.getElementById("customCategorySelect").value;
+  const lines = document.getElementById("customListArea").value.split("\n").map(l=>l.trim()).filter(Boolean);
+  if (!lines.length){ addLog("List was empty — nothing saved. Use Reset to clear an override.", "⚠️"); return; }
+  if (!state.customPools[typeKey]) state.customPools[typeKey] = {};
+  state.customPools[typeKey][category] = lines;
+  addLog(`Custom "${fieldLabel(category)}" list saved for ${GAME_TYPES[typeKey].name} (${lines.length} entries).`, "✎");
+});
+document.getElementById("resetCustomListBtn").addEventListener("click", ()=>{
+  const typeKey = state.gameType;
+  const category = document.getElementById("customCategorySelect").value;
+  if (state.customPools[typeKey]) delete state.customPools[typeKey][category];
+  loadCustomCategoryIntoTextarea();
+  addLog(`"${fieldLabel(category)}" list reset to default for ${GAME_TYPES[typeKey].name}.`, "↩️");
+});
+
 function addEnemyFromInput(){
   const nameInput = document.getElementById("enemyNameInput");
   const hpInput = document.getElementById("enemyHpInput");
@@ -1441,10 +2762,10 @@ document.getElementById("toggleLockBtn").addEventListener("click", ()=>{
 
 document.getElementById("genSaveCodeBtn").addEventListener("click", ()=>{
   const payload = {
-    seed: state.seed, gameType: state.gameType,
+    seed: state.seed, gameType: state.gameType, difficulty: state.difficulty,
     scenario: state.scenario, floors: state.floors, currentFloorIdx: state.currentFloorIdx,
-    players: state.players, enemies: state.enemies,
-    turnOrder: state.turnOrder, currentTurnIdx: state.currentTurnIdx
+    players: state.players, enemies: state.enemies, loot: state.loot, customPools: state.customPools,
+    turnOrder: state.turnOrder, currentTurnIdx: state.currentTurnIdx, selectedRoomId: state.selectedRoomId, inventoryFilter: state.inventoryFilter, mapZoom: state.mapZoom
   };
   const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   document.getElementById("saveCodeArea").value = code;
@@ -1456,17 +2777,27 @@ document.getElementById("applyLoadBtn").addEventListener("click", ()=>{
   try{
     const payload = JSON.parse(decodeURIComponent(escape(atob(code))));
     state.seed = payload.seed;
+    state.lastAutoSeed = payload.seed;
     state.gameType = payload.gameType;
+    state.difficulty = payload.difficulty || "normal";
     state.scenario = payload.scenario;
     state.floors = payload.floors || (payload.map ? [payload.map] : []);
     state.currentFloorIdx = payload.currentFloorIdx || 0;
     state.map = state.floors[state.currentFloorIdx] || null;
     state.players = payload.players || [];
     state.enemies = payload.enemies || [];
+    state.loot = payload.loot || [];
+    state.customPools = payload.customPools || {};
     state.turnOrder = payload.turnOrder || [];
     state.currentTurnIdx = payload.currentTurnIdx ?? -1;
+    state.selectedRoomId = payload.selectedRoomId || null;
+    state.inventoryFilter = payload.inventoryFilter || "all";
+    state.mapZoom = payload.mapZoom || 1;
+    state.players.forEach(p=>{ if(p.hp===undefined) p.hp=p.maxHp||20; if(p.maxHp===undefined) p.maxHp=p.hp||20; if(p.locationId===undefined) p.locationId=state.map?.rooms.find(r=>r.isStart)?.id||null; if(!p.icon) p.icon="👤"; if(!p.color) p.color="#2dd4bf"; });
+    state.loot.forEach(normalizeLootItem);
     document.getElementById("seedInput").value = state.seed;
     document.getElementById("seedDisplay").textContent = state.seed;
+    document.querySelectorAll(".diffBtn").forEach(b=>b.classList.toggle("active", b.getAttribute("data-diff")===state.difficulty));
     addLog("Game loaded from save code.", "📂");
     renderAll();
   }catch(err){
@@ -1474,10 +2805,23 @@ document.getElementById("applyLoadBtn").addEventListener("click", ()=>{
   }
 });
 
+/* ---- map quality-of-life controls ---- */
+function updateMapZoom(next){ state.mapZoom=Math.max(.75,Math.min(1.6,next)); renderMap(); }
+const mapZoomInBtn=document.getElementById("mapZoomIn");
+const mapZoomOutBtn=document.getElementById("mapZoomOut");
+const mapZoomResetBtn=document.getElementById("mapZoomReset");
+const mapCenterBtn=document.getElementById("mapCenterBtn");
+if(mapZoomInBtn) mapZoomInBtn.addEventListener("click",()=>updateMapZoom((state.mapZoom||1)+.15));
+if(mapZoomOutBtn) mapZoomOutBtn.addEventListener("click",()=>updateMapZoom((state.mapZoom||1)-.15));
+if(mapZoomResetBtn) mapZoomResetBtn.addEventListener("click",()=>updateMapZoom(1));
+if(mapCenterBtn) mapCenterBtn.addEventListener("click",()=>{ const vp=document.getElementById("mapViewport"); if(vp){vp.scrollLeft=(vp.scrollWidth-vp.clientWidth)/2;vp.scrollTop=(vp.scrollHeight-vp.clientHeight)/2;} });
+
 /* initial paint */
+populateClassSelect();
 renderAll();
 
 })();
-</script>
+    </script>
 </body>
+
 </html>
