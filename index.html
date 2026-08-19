@@ -1,3 +1,11 @@
+<!-- OPS DECK v2.0 — CONSOLIDATED RULES / AVRAE-FIRST -->
+<!-- OPS DECK v1.6 — PLAYER ICONS RESTORED -->
+<!-- OPS DECK v1.5 — SINGLE COMBAT SYSTEM / AVRAE FIRST -->
+<!-- OPS DECK v1.4 — COMBATANT FORM FIX -->
+<!-- OPS DECK v1.3 — FIXED COMBAT + SINGLE SECURITY SYSTEM -->
+<!-- OPS DECK v1.2 — AVRAE FIRST / LOCAL DICE REMOVED -->
+<!-- OPS DECK v1.1 — Security + Combat Update -->
+<!-- OPS DECK v1.0 polished revision -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -1122,6 +1130,83 @@
             }
         }
     </style>
+
+<style id="opsdeck-polish-css">
+/* OPS DECK v1.0 polish layer */
+:root{
+  --od-radius: 14px;
+  --od-shadow: 0 8px 24px rgba(0,0,0,.16);
+}
+button, .btn, input, select, textarea { font: inherit; }
+button, .btn {
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+}
+button:hover, .btn:hover { filter: brightness(1.06); }
+button:active, .btn:active { transform: translateY(1px); }
+button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.room, .room-card, .map-room, .card, .panel {
+  border-radius: var(--od-radius);
+}
+.opsdeck-toast{
+  position:fixed; right:18px; bottom:18px; z-index:99999;
+  max-width:360px; padding:12px 14px; border-radius:12px;
+  background:rgba(20,20,24,.96); color:#fff; box-shadow:var(--od-shadow);
+  font-size:13px; line-height:1.35; opacity:0; transform:translateY(8px);
+  pointer-events:none; transition:opacity .16s ease, transform .16s ease;
+}
+.opsdeck-toast.show{opacity:1; transform:translateY(0);}
+.opsdeck-statusbar{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  margin:8px 0 12px;
+}
+.opsdeck-pill{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:5px 9px; border-radius:999px;
+  background:rgba(127,127,127,.12); font-size:12px;
+}
+.opsdeck-save-dot{width:7px;height:7px;border-radius:50%;display:inline-block;background:#888}
+.opsdeck-save-dot.saved{background:#35b86b}
+.opsdeck-save-dot.dirty{background:#d79b2b}
+.opsdeck-help{
+  margin:8px 0; padding:9px 11px; border-radius:10px;
+  background:rgba(127,127,127,.09); font-size:12px; line-height:1.4;
+}
+.opsdeck-empty{
+  padding:18px; text-align:center; opacity:.72; border:1px dashed rgba(127,127,127,.35);
+  border-radius:12px;
+}
+@media (max-width: 800px){
+  .opsdeck-statusbar{gap:6px}
+  .opsdeck-pill{font-size:11px}
+}
+</style>
+
+
+
+
+
+<style id="opsdeck-v16-icons-css">
+.od-icon-tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.od-icon-tools input{padding:7px 9px;border-radius:8px;border:1px solid rgba(127,127,127,.3);width:70px}
+.od-player-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:9px;
+  font-size:18px;line-height:1;
+  flex:0 0 28px;
+}
+</style>
+
+
+<style id="opsdeck-v20-rules-css">
+.rules-body ol{padding-left:20px;margin:7px 0 12px}
+.rules-body code{background:var(--bg-inset);border:1px solid var(--border-soft);padding:2px 5px;border-radius:4px;font-family:var(--font-mono)}
+.rules-body li{margin-bottom:4px}
+.od-v20-callout{border:1px solid var(--teal-dim);background:rgba(79,168,160,.06);padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.5;margin:10px 0}
+</style>
+
 </head>
 
 <body>
@@ -1151,115 +1236,129 @@
         <div class="panel" id="rulesPanel" style="display:none;">
             <div class="panel-title"><span>Running This As Host</span><button id="closeRulesBtn" class="ghost" style="font-size:11px;padding:4px 9px;">✕ Close</button></div>
             <div class="rules-body">
+<h3>OPS DECK — How To Play</h3>
+<p><b>GM runs the world. Players describe actions. Avrae rolls every die. OPS DECK tracks the result.</b></p>
 
-                <h3>What this actually is</h3>
-                <p>This page is a generator + dashboard for you as GM. It does not play the game for you and it doesn't talk to Discord directly. Its job is: roll up a scenario, a map, an encounter, and loot for you in one click, keep track of the table's
-                    state (players, HP, turn order, what's been found), and give you a place to jot down what actually happens. Dice are still rolled in Discord with Avrae — you type the results back in here.</p>
+<h3>1. The Core Loop</h3>
+<ol>
+<li>GM describes the situation.</li>
+<li>Player says what they want to do.</li>
+<li>If failure is uncertain and matters, GM calls for a roll.</li>
+<li>Player rolls in Discord with Avrae.</li>
+<li>Compare the result to the DC.</li>
+<li>GM applies the consequence and updates the dashboard.</li>
+</ol>
+<p>If something is obvious, do not roll. If the rules do not cover something, the GM makes a reasonable ruling.</p>
 
-                <h3>The three game types</h3>
-                <p><b>The Heist</b> — infiltrate a target, grab an objective, get out. <b>Haunted House</b> — survive/escape/uncover the truth in a location with a threat in it. <b>World Collapse</b> — a survival scenario after some kind of disaster. Click
-                    a card at the top to pick one before generating; each has its own word pools for targets/threats/loot/enemies so the flavor stays consistent.</p>
+<h3>2. Checks</h3>
+<p><b>Roll: 1d20 + the relevant modifier.</b></p>
+<div class="rules-body"><ul>
+<li>DC 5 — Very Easy</li>
+<li>DC 10 — Easy</li>
+<li>DC 12 — Moderate</li>
+<li>DC 15 — Hard</li>
+<li>DC 18 — Very Hard</li>
+<li>DC 20 — Extreme</li>
+</ul></div>
+<p>Meet or beat the DC = success. Below the DC = failure.</p>
+<p><b>Natural 20:</b> critical success. <b>Natural 1:</b> critical failure/complication. A critical failure should create a problem, not automatically end the game.</p>
 
-                <h3>Difficulty</h3>
-                <p>The Easy / Normal / Hard / Deadly toggle (top bar) controls how many enemies spawn, how much HP they have, whether a boss shows up, and how dangerous the starting SECURITY/DREAD/STABILITY meter reads. It only applies the <b>next</b> time
-                    you hit Generate Game — changing it mid-game doesn't retroactively touch the current encounter.</p>
+<h3>3. Characters</h3>
+<p>Characters track HP, AC, Attack Bonus, STR, DEX, INT, WIS, skills, abilities, equipment and class.</p>
+<ul>
+<li><b>STR:</b> force, melee, lifting, breaking.</li>
+<li><b>DEX:</b> stealth, movement, dodging, ranged attacks.</li>
+<li><b>INT:</b> hacking, investigation, technology, puzzles.</li>
+<li><b>WIS:</b> perception, medicine, survival, danger.</li>
+</ul>
+<p>Normal trained skill bonus: <b>+2</b>. Highly trained: <b>+3</b>. GM decides the appropriate skill.</p>
 
-                <h3>Generate row</h3>
-                <ul>
-                    <li><b>Seed box</b> — leave blank for a random game. Every generated game shows its seed next to SEED at the top; paste that seed back into this box before hitting Generate to reproduce the exact same scenario/map/encounter later. If you
-                        don't touch the box, Generate always rolls fresh — it won't accidentally repeat itself.</li>
-                    <li><b>🎲 Generate Game</b> — rolls a brand new scenario, map, encounter, and loot list together. Resets turn order.</li>
-                    <li><b>🔄 Regenerate Scenario</b> — rerolls only the target/objective/complication/secret and danger meter. Keeps your current map, enemies, and loot untouched.</li>
-                    <li><b>🗺️ Regenerate Map</b> — rerolls only the map for whichever floor tab is currently active. Keeps the scenario. Also reshuffles which rooms enemies are standing in and rebuilds the loot list to match the new rooms.</li>
-                    <li><b>✎ Customize Word Lists</b> — lets you rewrite the pools the generator draws from (targets, threats, loot, enemy names, boss names, etc.), one line per entry. Pick a game type card first, open this, choose a category, edit the list,
-                        Save. Reset to Default clears your override. Your custom list is used from then on for that game type until you reset it.</li>
-                    <li><b>💾 Save Game / 📂 Load Game</b> — down in the Save/Load panel: Generate Save Code turns your whole current state (scenario, map, floors, players, enemies, loot, turn order) into a text blob you can paste somewhere safe; Load takes
-                        that blob back and restores everything exactly.</li>
-                </ul>
+<h3>4. Advantage / Disadvantage</h3>
+<p>Advantage = roll 2d20 and keep the higher. Disadvantage = roll 2d20 and keep the lower.</p>
+<p><code>/r 2d20kh1+MOD</code> &nbsp; <code>/r 2d20kl1+MOD</code></p>
 
-                <h3>Host view vs Player view</h3>
-                <p>Toggle top-right. <b>Host view</b> shows you everything: the GM secret, every room's loot/events/secret flag, enemy positions, locked doors. <b>Player view</b> hides all of that and fogs any room you haven't clicked to reveal yet — this
-                    is the view you should have up if you're sharing your screen with the table.</p>
+<h3>5. Combat</h3>
+<p>Combat begins when the situation needs turn order. Roll initiative in Avrae:</p>
+<p><code>/r 1d20+DEX</code></p>
+<p>Highest initiative goes first. On a turn, a character may <b>move, attack, use an ability, use an item, or help</b>.</p>
+<p><b>Attack:</b> <code>/r 1d20+AttackBonus</code>. If the result meets or beats the enemy AC, it hits. Then roll damage in Avrae.</p>
+<ul>
+<li>Knife — 1d4</li>
+<li>Pistol — 1d6</li>
+<li>Rifle — 1d8</li>
+<li>Shotgun — 1d10</li>
+<li>Heavy Weapon — 1d12</li>
+<li>Improvised Weapon — 1d4</li>
+</ul>
+<p>Combat is optional. Players can hide, escape, negotiate, disable enemies, or finish the objective and leave.</p>
 
-                <h3>Mission Briefing panel</h3>
-                <p>Shows the generated scenario fields, the danger meter, and (host view only) the GM secret. <b>Click directly on any field's text</b> (or the secret) to type over it — everything the generator picks is a first draft, not final. The 🖨️
-                    Print button builds a clean printable sheet (scenario, room list, players, encounter, loot) and opens your browser's print dialog — save as PDF from there if you want a physical or digital handout.</p>
+<h3>6. HP &amp; Down</h3>
+<p>At <b>0 HP</b>, a character is <b>DOWN</b> and normally cannot act until helped. A teammate can attempt <b>DC 10 Medicine</b>; on success, the Down character returns to 1 HP.</p>
 
-                <h3>Ops Map panel</h3>
-                <ul>
-                    <li>Floor tabs sit above the map. <b>+ Add Floor</b> generates a second connected map (for multi-level scenarios) and logs a flavor line about stairs connecting them.</li>
-                    <li>In host view, <b>click any room</b> to reveal it — that's the only thing that reveals a room; nothing happens automatically. Once revealed, it also shows up unfogged in Player view.</li>
-                    <li>Icons in a room: 🎁 loot, ⚡ event, ⚑ secret (host only), ⚔ + a number = live enemies posted there (host only), 🔒 on a connecting line = locked door, 📝 = you've added a note to that room.</li>
-                </ul>
+<h3>7. Movement &amp; Rooms</h3>
+<p>OPS DECK uses <b>room-to-room movement</b>, not a 5-foot grid. A player moves along a connected map route. Normally, moving to an adjacent room is the movement for that turn.</p>
+<p>The GM may allow extra movement when the scene is safe, or require a check when movement is risky.</p>
 
-                <h3>Room Notes panel</h3>
-                <p>Pick any room from the dropdown, write whatever actually happened there (an Avrae roll result, an ambush, a ruling you made), hit Save Note. It shows up as a 📝 tag on the map. <b>Toggle Locked Door</b> flips whether that room's connecting
-                    door is locked, any time.</p>
+<h3>8. Security / Scenario Meter</h3>
+<p>In Heist, the meter is <b>Security</b>. It rises from failed stealth, alarms, camera detection, escaped guards and excessive noise. It can fall when players disable cameras, bypass security, deal with guards quietly, or complete special objectives.</p>
+<ul>
+<li>0–2 — Calm</li>
+<li>3–4 — Suspicious</li>
+<li>5–6 — Alert</li>
+<li>7–8 — Lockdown</li>
+<li>9 — Critical</li>
+<li>10 — Final Lockdown</li>
+</ul>
+<p><b>Final Lockdown is a consequence state, not an automatic "you lose" button.</b> The GM decides the final complication, escape pressure, reinforcements or objective change.</p>
 
-                <h3>Loot &amp; Inventory panel</h3>
-                <p>Auto-populated from whatever loot the map generator scattered around (rebuilds when you regenerate the map or add a floor). Check a box to mark something collected — it strikes through. You can also add your own items by hand with an optional
-                    source note.</p>
+<h3>9. Other Modes</h3>
+<p><b>Haunted House:</b> the meter is Dread. It rises from failed supernatural checks, cursed objects, major supernatural events and separation.</p>
+<p><b>World Collapse:</b> the meter is Stability. It tracks how close the situation is to collapse as supplies, survival, disasters, enemies and objectives affect the situation.</p>
 
-                <h3>Players panel</h3>
-                <p>Type a name, pick a class from the dropdown, hit Add. <b>+ tag</b> on a player row lets you flag status effects (Hidden, Injured, Poisoned, Down, Restrained, Inspired) — click a tag to remove it. Remove a player with the ✕.</p>
+<h3>10. Items &amp; Inventory</h3>
+<ul>
+<li><b>Medkit:</b> restore 1d6 HP using Avrae.</li>
+<li><b>Master Key:</b> automatically opens one compatible lock.</li>
+<li><b>EMP Grenade:</b> disables electronic devices in the affected area.</li>
+<li><b>Security Badge:</b> allows access to restricted areas.</li>
+</ul>
+<p>Reasonably small items can normally be carried. No complicated weight calculation is required; GM decides when something is excessive.</p>
 
-                <h3>How classes actually work here</h3>
-                <p>The class system is very random dawg The heist classes
-                    <li>Thief - -3 in anything related to theiving (debateable)</li>
-                    <li> Rogue - -3 in anything related to sneaking</li>
-                    <li> Hacker - -3 in anything related to tech </li>
-                    <li> Muscle - -3 and + 3 damage in anything related to phyical stuff </li>
-                    Haunted House classes
-                    <li>Priest - +3 damage in exorcism </li>
-                    <li>Cultist - 25% summoning ghost to fight for u or convince ghost </li>
-                    <li>Ghostlore - u can talk to ghost only lmao (good with cultist) </li>
-                    <li> Camera man - U have a set of tools u can use but ur twoshot</li>
-                    <li>Tools - Camera (picture ghost) Flashlight (yes) ECM jammer (hehe no 911 call for u )</li>
-                    WORLD END CLASSESSSS
-                    <li>Scavenger - +3 in anything about scavenging</li>
-                    <li>Medic - +3 in anything about healing</li>
-                    <li>Builder - +3 in anything about Building</li>
-                    <li>Survivalist - +3 in anything about Fighting and a 25% damage boost</li>
+<h3>11. Objectives</h3>
+<p>Missions can have a <b>Main Objective</b>, <b>Optional Objectives</b>, and a <b>Hidden Objective</b>. Completing the objective does not necessarily end the mission; players may still need to escape or survive.</p>
 
+<h3>12. Secrets</h3>
+<p>Secret rooms, hidden objectives, hidden events and GM-only information are <b>not shown to players</b> until discovered. The GM decides what clue or action reveals them.</p>
 
+<h3>13. Failure</h3>
+<p>Failure should usually change the situation instead of stopping the story. Examples: an alarm activates, a guard notices the player, a door locks, an enemy appears, time runs out, or the scenario meter increases.</p>
 
+<h3>14. Avrae Is The Dice Engine</h3>
+<p>OPS DECK never decides a random player outcome. Use Avrae for:</p>
+<ul>
+<li>Checks: <code>/r 1d20+MOD</code></li>
+<li>Attack: <code>/r 1d20+ATTACK</code></li>
+<li>Damage: <code>/r 1d8+MOD</code></li>
+<li>Initiative: <code>/r 1d20+DEX</code></li>
+<li>Advantage: <code>/r 2d20kh1+MOD</code></li>
+<li>Disadvantage: <code>/r 2d20kl1+MOD</code></li>
+</ul>
+<p><b>OPS DECK = map, mission, characters, enemies, items, meters and tracking. Avrae = dice. GM = final ruling.</b></p>
 
-
-
-
-                </p>
-
-                <h3>Turn Order panel</h3>
-                <p><b>🎲 Roll Initiative</b> rolls a d20 for every current player <i>and</i> every current enemy and merges them into one sorted list. <b>⏭ Next Turn</b> steps through it and highlights whoever's up, looping back to the top after the last
-                    one.
-                </p>
-
-                <h3>Enemies / NPCs panel</h3>
-                <p>Enemies spawn automatically every time you Generate Game (count and HP scale with Difficulty; on Hard/Deadly there's a chance one is a 👑 boss with much higher HP). Each shows which room it's posted in. <b>🎲 Reroll Encounter</b> scraps
-                    the current enemies and rolls a fresh set without touching the scenario or map. You can also add one manually (name + starting HP). Each enemy row has a damage/heal input — type an amount, hit − Dmg or + Heal, and its HP bar updates.
-                    <b>Dropping an enemy to 0 HP doesn't remove it automatically</b> — it just stops counting toward that room's ⚔ badge on the map. Once it's actually dead and you're done with it, remove it with the ✕ so it stops cluttering the Enemies
-                    panel and turn order.</p>
-
-                <h3>Roll Resolution panel</h3>
-                <p>Set a DC, hit <b>Request Roll</b> — this pulls in whoever's currently in the turn order (or your player list, if no turn order yet) and gives each a row. <b>📋 Copy for Avrae</b> copies a ready-to-paste <code>!r 1d20+MOD dc &lt;DC&gt;</code>                    command for Discord. As each player calls out their Avrae result, type their natural d20 roll and their modifier into that row, then hit <b>Resolve Rolls</b> — it works out success/fail against the DC, and a natural 20 or 1 is automatically
-                    flagged as a crit.</p>
-
-                <h3>Activity Log panel</h3>
-                <p>Everything the tool does — reveals, damage, rolls, joins — logs itself here automatically with a timestamp. There's also a plain text box at the top of the log so <b>you</b> can type in anything that happened in your own words, independent
-                    of the automated entries — useful for narrating outcomes that came from an Avrae roll rather than the built-in roll resolver.</p>
-
-                <h3>Good to know / limitations</h3>
-                <ul>
-                    <li><b>Nothing auto-saves.</b> This all lives in your browser tab only. Closing the tab or refreshing wipes everything unless you clicked Generate Save Code first and kept the text somewhere.</li>
-                    <li><b>No live sync between screens.</b> If your players want to see the map, you either share your screen (in Player view!) or read it out to them — there's no server, so a second device won't see your changes.</li>
-                    <li><b>Revealed rooms can't be re-fogged.</b> Once you click a room to reveal it, there's no button to hide it again in Player view — treat revealing as a one-way action.</li>
-                    <li><b>Difficulty isn't retroactive.</b> Changing it only affects the next full Generate Game, not the encounter you're currently running.</li>
-                    <li><b>Print grabs whatever you're looking at.</b> If you're in Player view when you hit 🖨️ Print, the secret and hidden room contents won't be on the sheet. Switch to Host view first if you want the full GM copy.</li>
-                    <li><b>Regenerating a map on Floor 2+</b> reshuffles that floor's rooms/loot, but currently-placed enemies only get reassigned to new rooms automatically when you regenerate Floor 1 — on other floors, re-post them yourself if the layout
-                        changed a lot.</li>
-                </ul>
-
-            </div>
+<h3>15. Quick Start</h3>
+<ol>
+<li>Choose Heist, Haunted House, or World Collapse.</li>
+<li>Choose difficulty.</li>
+<li>Create characters.</li>
+<li>Generate the mission.</li>
+<li>GM describes the opening scene.</li>
+<li>Players choose actions.</li>
+<li>Roll only when necessary, using Avrae.</li>
+<li>Track HP, enemies, loot, movement and the scenario meter.</li>
+<li>Complete the objective.</li>
+<li>Escape or survive.</li>
+</ol>
+</div>
 
         </div>
 
@@ -1379,10 +1478,24 @@
                 <div class="panel">
                     <div class="panel-title"><span>Turn Order</span></div>
                     <ul class="player-list" id="turnOrderList"></ul>
-                    <div class="turn-controls">
-                        <button id="rollInitBtn">🎲 Roll Initiative</button>
+                    
+<div class="od-v20-callout">
+<b>🎲 Avrae-first combat:</b> Roll initiative, attacks and damage in Discord with Avrae. OPS DECK only records the results and advances the turn.
+</div>
+<div class="turn-controls">
+                        <button id="rollInitBtn">🤖 Copy Initiative for Avrae</button>
                         <button id="nextTurnBtn" class="primary">⏭ Next Turn</button>
                     </div>
+                    <div class="add-player-row" style="margin-top:10px;">
+                        <input type="text" id="combatantNameInput" placeholder="Combatant name...">
+                        <select id="combatantTypeInput" style="width:110px;">
+                            <option value="enemy">Enemy</option>
+                            <option value="player">Player</option>
+                        </select>
+                        <input type="number" id="combatantHpInput" placeholder="HP" style="width:64px;">
+                        <button id="addCombatantBtn">Add Combatant</button>
+                    </div>
+                    <div class="map-hint">Adds the combatant to the existing player/enemy roster. Roll initiative in Discord with Avrae.</div>
                 </div>
 
                 <div class="panel">
@@ -1406,7 +1519,7 @@
                         <button id="requestRollBtn">Request Roll</button>
                         <button id="copyAvraeBtn" title="Copy an Avrae roll command to paste in Discord">📋 Copy for Avrae</button>
                     </div>
-                    <div class="map-hint" style="margin-top:-6px;margin-bottom:10px;">Enter each player's natural d20 + modifier as read out from Avrae, then resolve.</div>
+                    <div class="map-hint" style="margin-top:-6px;margin-bottom:10px;">Roll in Discord with Avrae. Enter the result here only to record it; OPS DECK never rolls.</div>
                     <div id="rollRows"></div>
                 </div>
 
@@ -2285,7 +2398,7 @@ function renderTurnOrder(){
       <span class="pname">${isEnemy?'⚔ ':''}${ent.name}${!isEnemy && ent.cls ? ` <span style="color:var(--text-faint);font-weight:400;">— ${ent.cls}</span>`:''}</span>
       ${tagsHtml}
       ${hpHtml}
-      <span class="init">${t.init}</span>
+      <span class="init">${t.init == null ? "—" : t.init}</span>
     </li>`;
   }).join("");
 }
@@ -2327,10 +2440,11 @@ function resolveRolls(){
     const mod = parseInt(r.mod,10)||0;
     const outcomeEl = document.getElementById("outcome-"+r.playerId);
     if (isNaN(nat)){
-      outcomeEl.textContent = "—";
+      outcomeEl.textContent = "Awaiting Avrae";
       outcomeEl.className = "roll-outcome";
       return;
     }
+    // This is not a roll: it records the result already produced by Avrae.
     const total = nat+mod;
     let label, cls, icon;
     if (nat===20){ label="CRIT SUCCESS"; cls="crit-s"; icon="🌟"; }
@@ -2339,7 +2453,7 @@ function resolveRolls(){
     else { label="FAIL"; cls="fail"; icon="❌"; }
     outcomeEl.textContent = `${total} · ${label}`;
     outcomeEl.className = "roll-outcome "+cls;
-    addLog(`${icon} ${r.name} rolled ${nat}${mod?(mod>0?'+'+mod:mod):''} = ${total} vs DC ${dc} — ${label}`, icon);
+    addLog(`${r.name}: Avrae result ${total} vs DC ${dc} — ${label}.`, icon);
   });
 }
 
@@ -2579,6 +2693,55 @@ function renderRollRowsSync(){
   renderRollRows();
 }
 
+document.getElementById("addCombatantBtn").addEventListener("click", addCombatantFromTurnPanel);
+document.getElementById("combatantNameInput").addEventListener("keydown", e=>{
+  if (e.key==="Enter") addCombatantFromTurnPanel();
+});
+function addCombatantFromTurnPanel(){
+  const nameEl = document.getElementById("combatantNameInput");
+  const typeEl = document.getElementById("combatantTypeInput");
+  const hpEl = document.getElementById("combatantHpInput");
+  const name = nameEl.value.trim();
+  const type = typeEl.value;
+  const hp = parseInt(hpEl.value,10) || 10;
+  if (!name){
+    addLog("Enter a combatant name first.", "⚠️");
+    nameEl.focus();
+    return;
+  }
+
+  if (type === "enemy"){
+    const enemy = {id:uid(), name, maxHp:hp, hp};
+    state.enemies.push(enemy);
+    addLog(`${name} added as an enemy (${hp} HP).`, "⚔");
+    renderEnemies();
+  } else {
+    const classSelect = document.getElementById("classSelect");
+    const cls = classSelect ? classSelect.value : "Adventurer";
+    const classHp = hp || 10;
+    const startRoom = state.map?.rooms?.[0] || null;
+    const player = {
+      id:uid(), name, tags:[], cls,
+      hp:classHp, maxHp:classHp,
+      locationId:startRoom?.id || null,
+      icon:"👤", color:"#2dd4bf"
+    };
+    state.players.push(player);
+    addLog(`${name} added as a player.`, "👤");
+    renderPlayers();
+    renderRollRowsSync();
+  }
+
+  // Add immediately to turn order with no fake initiative result.
+  const entity = type === "enemy" ? state.enemies[state.enemies.length-1] : state.players[state.players.length-1];
+  state.turnOrder = state.turnOrder.filter(t=>!(t.id===entity.id));
+  state.turnOrder.push({id:entity.id, type, init:null});
+  if (state.currentTurnIdx < 0) state.currentTurnIdx = 0;
+
+  nameEl.value = "";
+  hpEl.value = "";
+  renderTurnOrder();
+}
 document.getElementById("addEnemyBtn").addEventListener("click", addEnemyFromInput);
 document.getElementById("enemyNameInput").addEventListener("keydown", e=>{
   if (e.key==="Enter") addEnemyFromInput();
@@ -2682,17 +2845,32 @@ function addEnemyFromInput(){
   renderEnemies();
 }
 
-document.getElementById("rollInitBtn").addEventListener("click", ()=>{
+document.getElementById("rollInitBtn").addEventListener("click", async ()=>{
   const roster = [
     ...state.players.map(p=>({id:p.id, type:"player"})),
     ...state.enemies.map(e=>({id:e.id, type:"enemy"}))
   ];
-  if (!roster.length){ addLog("No players or enemies to roll initiative for.", "⚠️"); return; }
-  state.turnOrder = roster.map(r=>({id:r.id, type:r.type, init: randInt(Math.random,1,20)}))
-    .sort((a,b)=>b.init-a.init);
-  state.currentTurnIdx = 0;
-  const summary = state.turnOrder.map(t=>`${entityById(t.id,t.type).name} (${t.init})`).join(", ");
-  addLog("Initiative rolled: "+summary, "🎲");
+  if (!roster.length){
+    addLog("No players or enemies to roll initiative for.", "⚠️");
+    return;
+  }
+
+  // Avrae is the dice engine. OPS DECK only creates the commands.
+  const commands = roster.map(r=>{
+    const ent = entityById(r.id,r.type);
+    return `/r 1d20${r.type==="player" ? "" : ""} — ${ent.name}`;
+  }).join("\n");
+
+  try{
+    await navigator.clipboard.writeText(commands);
+    addLog("Copied initiative commands for Avrae. Roll them in Discord, then enter the results into Turn Order.", "📋");
+  }catch(err){
+    addLog("Avrae initiative commands:\n"+commands, "🎲");
+  }
+
+  // Create the turn-order entries without inventing dice results.
+  state.turnOrder = roster.map(r=>({id:r.id, type:r.type, init:null}));
+  state.currentTurnIdx = state.turnOrder.length ? 0 : -1;
   renderTurnOrder();
 });
 document.getElementById("nextTurnBtn").addEventListener("click", ()=>{
@@ -2723,9 +2901,9 @@ document.getElementById("copyAvraeBtn").addEventListener("click", async ()=>{
   const cmd = `!r 1d20+MOD dc ${dc}`;
   try{
     await navigator.clipboard.writeText(cmd);
-    addLog(`Copied Avrae command to clipboard: "${cmd}" (swap MOD for each player's bonus).`, "📋");
+    addLog(`Copied Avrae check command: "${cmd}". Replace MOD with the character's modifier.`, "📋");
   }catch(err){
-    addLog(`Couldn't access clipboard — command is: "${cmd}"`, "⚠️");
+    addLog(`Avrae command: ${cmd}`, "🎲");
   }
 });
 
@@ -2822,6 +3000,233 @@ renderAll();
 
 })();
     </script>
+
+<script id="opsdeck-polish-js">
+(function(){
+  'use strict';
+  function toast(msg){
+    let t=document.querySelector('.opsdeck-toast');
+    if(!t){
+      t=document.createElement('div');
+      t.className='opsdeck-toast';
+      document.body.appendChild(t);
+    }
+    t.textContent=msg;
+    t.classList.add('show');
+    clearTimeout(window.__odToastTimer);
+    window.__odToastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+  }
+  window.OPSDeckToast=toast;
+
+  function findGameObject(){
+    const candidates=['state','gameState','game','S','appState'];
+    for(const k of candidates){
+      try{
+        if(window[k] && typeof window[k]==='object') return window[k];
+      }catch(e){}
+    }
+    return null;
+  }
+
+  function markDirty(){
+    document.documentElement.dataset.opsdeckDirty='1';
+    const dot=document.querySelector('.opsdeck-save-dot');
+    if(dot) dot.classList.remove('saved'), dot.classList.add('dirty');
+  }
+
+  function markSaved(){
+    document.documentElement.dataset.opsdeckDirty='0';
+    const dot=document.querySelector('.opsdeck-save-dot');
+    if(dot) dot.classList.remove('dirty'), dot.classList.add('saved');
+  }
+
+  window.addEventListener('beforeunload', function(e){
+    if(document.documentElement.dataset.opsdeckDirty==='1'){
+      e.preventDefault();
+      e.returnValue='';
+    }
+  });
+
+  // Wrap common mutating UI actions so the user gets feedback even if the
+  // underlying application uses inline onclick handlers.
+  document.addEventListener('click', function(e){
+    const el=e.target.closest('button,.btn');
+    if(!el) return;
+    const label=(el.innerText||el.getAttribute('aria-label')||'').trim();
+    if(/save|autosave/i.test(label)){
+      setTimeout(markSaved,80);
+      toast('Game saved');
+    }else if(/move|give|collect|drop|reveal|unlock|lock|trigger|spawn|damage|heal/i.test(label)){
+      setTimeout(markDirty,80);
+    }
+  }, true);
+
+  // Keyboard shortcut: Escape closes common modal/dialog overlays.
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){
+      const close=document.querySelector('[data-close], .modal .close, .modal-close, [aria-label="Close"]');
+      if(close) close.click();
+    }
+  });
+
+  // Add a compact status strip to the first main content area, if one exists.
+  function addStatus(){
+    if(document.querySelector('.opsdeck-statusbar')) return;
+    const host=document.querySelector('main, #app, .app, .container, body');
+    if(!host) return;
+    const bar=document.createElement('div');
+    bar.className='opsdeck-statusbar';
+    bar.innerHTML=
+      '<span class="opsdeck-pill">🎲 Avrae-ready</span>'+
+      '<span class="opsdeck-pill">🗺️ Interactive Map</span>'+
+      '<span class="opsdeck-pill">🎒 Inventory</span>'+
+      '<span class="opsdeck-pill"><span class="opsdeck-save-dot saved"></span> Save status</span>';
+    const first=host.firstElementChild;
+    if(first && first.parentNode===host) host.insertBefore(bar, first.nextSibling);
+    else host.prepend(bar);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addStatus);
+  else addStatus();
+
+  // Prevent accidental duplicate form submission on Enter in text inputs.
+  document.addEventListener('keydown', function(e){
+    if(e.key!=='Enter') return;
+    const el=e.target;
+    if(el.matches('input[type="text"], input[type="number"]') && el.closest('form')){
+      // Let explicit submit buttons continue to work.
+      if(!e.ctrlKey && !e.metaKey) e.stopPropagation();
+    }
+  }, true);
+})();
+</script>
+
+
+
+
+
+<script id="opsdeck-v16-icons-js">
+(function(){
+  'use strict';
+
+  function toast(msg){
+    if(window.OPSDeckToast) window.OPSDeckToast(msg);
+    else console.log(msg);
+  }
+
+  function getState(){
+    return window.state && typeof window.state === 'object' ? window.state : null;
+  }
+
+  function ensurePlayerIcons(){
+    const s=getState();
+    if(!s || !Array.isArray(s.players)) return;
+    s.players.forEach(p=>{
+      if(!p.icon) p.icon="👤";
+      if(!p.color) p.color="#2dd4bf";
+    });
+  }
+
+  function renderIconTools(){
+    if(document.getElementById('od-v16-icon-tools')) return;
+    const s=getState();
+    if(!s || !Array.isArray(s.players) || !s.players.length) return;
+
+    const host=document.querySelector('#playersList, .players-list, #playerList, .player-list');
+    if(!host) return;
+
+    const box=document.createElement('div');
+    box.id='od-v16-icon-tools';
+    box.className='od-icon-tools';
+    box.innerHTML=
+      '<strong>👤 Icons</strong>'+
+      '<select id="od-v16-player" style="padding:7px 9px;border-radius:8px;border:1px solid rgba(127,127,127,.3)"></select>'+
+      '<input id="od-v16-icon" maxlength="4" value="👤" aria-label="Player icon">'+
+      '<input id="od-v16-color" type="color" value="#2dd4bf" aria-label="Player marker color">'+
+      '<button type="button" id="od-v16-apply">Apply</button>';
+
+    host.parentNode.insertBefore(box, host);
+    refreshTools();
+
+    document.getElementById('od-v16-player').addEventListener('change', refreshTools);
+    document.getElementById('od-v16-apply').addEventListener('click', applyIcon);
+  }
+
+  function refreshTools(){
+    const s=getState();
+    const sel=document.getElementById('od-v16-player');
+    if(!s || !sel) return;
+    sel.innerHTML=s.players.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>').join('');
+    const p=s.players.find(x=>String(x.id)===String(sel.value)) || s.players[0];
+    if(!p) return;
+    document.getElementById('od-v16-icon').value=p.icon||"👤";
+    document.getElementById('od-v16-color').value=p.color||"#2dd4bf";
+  }
+
+  function applyIcon(){
+    const s=getState();
+    if(!s) return;
+    const id=document.getElementById('od-v16-player')?.value;
+    const p=s.players.find(x=>String(x.id)===String(id));
+    if(!p) return;
+    p.icon=(document.getElementById('od-v16-icon').value||"👤").trim().slice(0,4);
+    p.color=document.getElementById('od-v16-color').value||"#2dd4bf";
+    if(typeof window.saveGame==='function') window.saveGame();
+    if(typeof window.renderPlayers==='function') window.renderPlayers();
+    if(typeof window.renderMap==='function') window.renderMap();
+    toast(p.name+" icon updated.");
+    refreshTools();
+  }
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  // Restore icon badges on map/player elements that are already rendered,
+  // without replacing the existing DOM structure.
+  function decorate(){
+    const s=getState();
+    if(!s || !Array.isArray(s.players)) return;
+    ensurePlayerIcons();
+
+    document.querySelectorAll('[data-player-id]').forEach(el=>{
+      const id=el.getAttribute('data-player-id');
+      const p=s.players.find(x=>String(x.id)===String(id));
+      if(!p) return;
+      if(!el.querySelector('.od-player-icon')){
+        const badge=document.createElement('span');
+        badge.className='od-player-icon';
+        badge.textContent=p.icon||"👤";
+        badge.style.background=p.color||"#2dd4bf";
+        badge.title=p.name;
+        el.prepend(badge);
+      }
+    });
+  }
+
+  function init(){
+    ensurePlayerIcons();
+    renderIconTools();
+    decorate();
+  }
+
+  // Re-run after the original game's rendering functions have updated the DOM.
+  const oldRenderPlayers=window.renderPlayers;
+  if(typeof oldRenderPlayers==='function'){
+    window.renderPlayers=function(){
+      const r=oldRenderPlayers.apply(this,arguments);
+      setTimeout(decorate,0);
+      setTimeout(renderIconTools,0);
+      return r;
+    };
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+  setInterval(()=>{ensurePlayerIcons(); decorate(); renderIconTools();},1200);
+})();
+</script>
+
 </body>
 
 </html>
