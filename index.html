@@ -1,3 +1,5 @@
+<!-- OPS DECK v2.2 — LAUNCH FIX: initiative entry/sort + autosave + full save state -->
+<!-- OPS DECK v2.1 — LIVE SCENARIO METER CONTROLS -->
 <!-- OPS DECK v2.0 — CONSOLIDATED RULES / AVRAE-FIRST -->
 <!-- OPS DECK v1.6 — PLAYER ICONS RESTORED -->
 <!-- OPS DECK v1.5 — SINGLE COMBAT SYSTEM / AVRAE FIRST -->
@@ -1207,6 +1209,25 @@ button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visi
 .od-v20-callout{border:1px solid var(--teal-dim);background:rgba(79,168,160,.06);padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.5;margin:10px 0}
 </style>
 
+
+<style id="opsdeck-v21-meter-css">
+.meter-host-controls{display:flex;gap:5px;align-items:center}
+.meter-host-controls button{font-family:var(--font-mono);font-size:11px;padding:4px 8px}
+.meter-host-controls .meter-set-zero{color:var(--teal)}
+.meter-host-controls .meter-set-max{color:var(--red)}
+.meter-help{font-size:10px;color:var(--text-faint);margin-top:5px}
+</style>
+
+
+<style id="opsdeck-v22-launch-css">
+.init-input{
+  width:58px;padding:5px 6px;border:1px solid var(--border-soft);
+  background:var(--bg-inset);color:var(--text);border-radius:4px;
+  font-family:var(--font-mono);font-size:12px;text-align:center;
+}
+.turn-controls{flex-wrap:wrap}
+</style>
+
 </head>
 
 <body>
@@ -1300,7 +1321,7 @@ button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visi
 <p>The GM may allow extra movement when the scene is safe, or require a check when movement is risky.</p>
 
 <h3>8. Security / Scenario Meter</h3>
-<p>In Heist, the meter is <b>Security</b>. It rises from failed stealth, alarms, camera detection, escaped guards and excessive noise. It can fall when players disable cameras, bypass security, deal with guards quietly, or complete special objectives.</p>
+<p>In Heist, the meter is <b>Security</b>. It is a live 0–10 dashboard meter. The GM can use the <b>−1 / +1 / 0 / MAX</b> controls to change it. Raise it for failed stealth, alarms, camera detection, escaped guards and excessive noise; lower it when players disable cameras, bypass security, deal with guards quietly, or complete special objectives.</p>
 <ul>
 <li>0–2 — Calm</li>
 <li>3–4 — Suspicious</li>
@@ -1484,6 +1505,7 @@ button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visi
 </div>
 <div class="turn-controls">
                         <button id="rollInitBtn">🤖 Copy Initiative for Avrae</button>
+                        <button id="sortInitBtn">↕ Sort Initiative</button>
                         <button id="nextTurnBtn" class="primary">⏭ Next Turn</button>
                     </div>
                     <div class="add-player-row" style="margin-top:10px;">
@@ -2021,7 +2043,14 @@ button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visi
       <div class="meter-label">${s.meterLabel}</div>
       <div class="meter-track"><div class="meter-fill" style="width:${pct}%"></div></div>
       <div class="meter-val">${s.meter}/${s.meterMax}</div>
+      ${state.hostView ? `<div class="meter-host-controls">
+        <button type="button" class="ghost" id="meterDownBtn" title="Decrease meter by 1">−1</button>
+        <button type="button" class="ghost" id="meterUpBtn" title="Increase meter by 1">+1</button>
+        <button type="button" class="ghost meter-set-zero" id="meterZeroBtn" title="Set meter to 0">0</button>
+        <button type="button" class="ghost meter-set-max" id="meterMaxBtn" title="Set meter to maximum">MAX</button>
+      </div>` : ''}
     </div>
+    ${state.hostView ? `<div class="meter-help">GM control: adjust ${s.meterLabel} when the story changes. 0 = calm/low pressure, ${s.meterMax} = maximum pressure.</div>` : ''}
     ${state.hostView ? `<div class="secret-box"><span class="label">🔒 GM Secret</span><span contenteditable="true" spellcheck="false" id="secretEdit">${s.secret}</span></div>` : ''}
   `;
 
@@ -2039,6 +2068,40 @@ button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visi
       addLog("Host edited the GM secret.", "✎");
     });
   }
+
+  const meterChange = (delta, label) => {
+    if (!state.scenario) return;
+    const before = Number(state.scenario.meter || 0);
+    const after = Math.max(0, Math.min(Number(state.scenario.meterMax || 10), before + delta));
+    if (after === before) return;
+    state.scenario.meter = after;
+    addLog(`${state.scenario.meterLabel} ${before} → ${after} (${label}).`, "🚨");
+    renderBriefing();
+    renderMap();
+  };
+  const meterDownBtn = document.getElementById("meterDownBtn");
+  const meterUpBtn = document.getElementById("meterUpBtn");
+  const meterZeroBtn = document.getElementById("meterZeroBtn");
+  const meterMaxBtn = document.getElementById("meterMaxBtn");
+  if (meterDownBtn) meterDownBtn.onclick = () => meterChange(-1, "GM lowered");
+  if (meterUpBtn) meterUpBtn.onclick = () => meterChange(1, "GM raised");
+  if (meterZeroBtn) meterZeroBtn.onclick = () => {
+    if (!state.scenario) return;
+    const before = Number(state.scenario.meter || 0);
+    if (before === 0) return;
+    state.scenario.meter = 0;
+    addLog(`${state.scenario.meterLabel} ${before} → 0 (GM reset).`, "🚨");
+    renderBriefing(); renderMap();
+  };
+  if (meterMaxBtn) meterMaxBtn.onclick = () => {
+    if (!state.scenario) return;
+    const max = Number(state.scenario.meterMax || 10);
+    const before = Number(state.scenario.meter || 0);
+    if (before === max) return;
+    state.scenario.meter = max;
+    addLog(`${state.scenario.meterLabel} ${before} → ${max} (GM maxed).`, "🚨");
+    renderBriefing(); renderMap();
+  };
 }
 
 /* ============================================================
@@ -2377,15 +2440,29 @@ function renderEnemies(){
   });
 }
 
+function sortTurnOrderByInitiative(){
+  // Stable descending sort. Combatants without an entered initiative stay at the end.
+  const indexed = state.turnOrder.map((t, index)=>({...t, _index:index}));
+  indexed.sort((a,b)=>{
+    const ai = Number.isFinite(Number(a.init)) ? Number(a.init) : -Infinity;
+    const bi = Number.isFinite(Number(b.init)) ? Number(b.init) : -Infinity;
+    if (bi !== ai) return bi - ai;
+    return a._index - b._index;
+  });
+  state.turnOrder = indexed.map(({_index,...t})=>t);
+  state.currentTurnIdx = state.turnOrder.length ? 0 : -1;
+}
+
 function renderTurnOrder(){
   const list = document.getElementById("turnOrderList");
-  // drop entries whose source entity no longer exists
+  // Drop entries whose source entity no longer exists.
   state.turnOrder = state.turnOrder.filter(t=>entityById(t.id, t.type));
   if (state.currentTurnIdx >= state.turnOrder.length) state.currentTurnIdx = state.turnOrder.length ? 0 : -1;
   if (!state.turnOrder.length){
-    list.innerHTML = `<div class="empty-state" style="padding:16px 4px;">Add players/enemies, then roll initiative.</div>`;
+    list.innerHTML = `<div class="empty-state" style="padding:16px 4px;">Add players/enemies, roll in Avrae, enter the results, then sort initiative.</div>`;
     return;
   }
+
   list.innerHTML = state.turnOrder.map((t,i)=>{
     const ent = entityById(t.id, t.type);
     const isEnemy = t.type==="enemy";
@@ -2398,9 +2475,18 @@ function renderTurnOrder(){
       <span class="pname">${isEnemy?'⚔ ':''}${ent.name}${!isEnemy && ent.cls ? ` <span style="color:var(--text-faint);font-weight:400;">— ${ent.cls}</span>`:''}</span>
       ${tagsHtml}
       ${hpHtml}
-      <span class="init">${t.init == null ? "—" : t.init}</span>
+      <input class="init-input" type="number" step="1" data-turn-id="${t.id}" data-turn-type="${t.type}" value="${t.init == null ? "" : t.init}" placeholder="Init" title="Enter the initiative rolled in Avrae">
     </li>`;
   }).join("");
+
+  list.querySelectorAll(".init-input").forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      const t = state.turnOrder.find(x=>x.id===inp.dataset.turnId && x.type===inp.dataset.turnType);
+      if (!t) return;
+      const raw = inp.value.trim();
+      t.init = raw === "" ? null : Number(raw);
+    });
+  });
 }
 
 /* ============================================================
@@ -2858,7 +2944,7 @@ document.getElementById("rollInitBtn").addEventListener("click", async ()=>{
   // Avrae is the dice engine. OPS DECK only creates the commands.
   const commands = roster.map(r=>{
     const ent = entityById(r.id,r.type);
-    return `/r 1d20${r.type==="player" ? "" : ""} — ${ent.name}`;
+    return `/r 1d20+DEX_MOD — ${ent.name}`;
   }).join("\n");
 
   try{
@@ -2873,6 +2959,14 @@ document.getElementById("rollInitBtn").addEventListener("click", async ()=>{
   state.currentTurnIdx = state.turnOrder.length ? 0 : -1;
   renderTurnOrder();
 });
+document.getElementById("sortInitBtn").addEventListener("click", ()=>{
+  if (!state.turnOrder.length){ addLog("No combatants to sort.", "⚠️"); return; }
+  const missing = state.turnOrder.filter(t=>t.init == null).length;
+  sortTurnOrderByInitiative();
+  addLog(missing ? `Turn order sorted. ${missing} combatant(s) still have no initiative.` : "Turn order sorted by initiative.", "↕");
+  renderTurnOrder();
+});
+
 document.getElementById("nextTurnBtn").addEventListener("click", ()=>{
   if (!state.turnOrder.length){ addLog("No turn order set — roll initiative first.", "⚠️"); return; }
   state.currentTurnIdx = (state.currentTurnIdx+1) % state.turnOrder.length;
@@ -2939,12 +3033,7 @@ document.getElementById("toggleLockBtn").addEventListener("click", ()=>{
 });
 
 document.getElementById("genSaveCodeBtn").addEventListener("click", ()=>{
-  const payload = {
-    seed: state.seed, gameType: state.gameType, difficulty: state.difficulty,
-    scenario: state.scenario, floors: state.floors, currentFloorIdx: state.currentFloorIdx,
-    players: state.players, enemies: state.enemies, loot: state.loot, customPools: state.customPools,
-    turnOrder: state.turnOrder, currentTurnIdx: state.currentTurnIdx, selectedRoomId: state.selectedRoomId, inventoryFilter: state.inventoryFilter, mapZoom: state.mapZoom
-  };
+  const payload = buildSavePayload();
   const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   document.getElementById("saveCodeArea").value = code;
   addLog("Save code generated.", "💾");
@@ -2994,8 +3083,104 @@ if(mapZoomOutBtn) mapZoomOutBtn.addEventListener("click",()=>updateMapZoom((stat
 if(mapZoomResetBtn) mapZoomResetBtn.addEventListener("click",()=>updateMapZoom(1));
 if(mapCenterBtn) mapCenterBtn.addEventListener("click",()=>{ const vp=document.getElementById("mapViewport"); if(vp){vp.scrollLeft=(vp.scrollWidth-vp.clientWidth)/2;vp.scrollTop=(vp.scrollHeight-vp.clientHeight)/2;} });
 
+
+/* ============================================================
+   LAUNCH SAFETY: LOCAL AUTOSAVE
+============================================================ */
+const OPSDECK_AUTOSAVE_KEY = "opsdeck_v22_autosave";
+
+function buildSavePayload(){
+  return {
+    version: "2.2",
+    seed: state.seed,
+    gameType: state.gameType,
+    difficulty: state.difficulty,
+    scenario: state.scenario,
+    floors: state.floors,
+    currentFloorIdx: state.currentFloorIdx,
+    players: state.players,
+    enemies: state.enemies,
+    loot: state.loot,
+    customPools: state.customPools,
+    turnOrder: state.turnOrder,
+    currentTurnIdx: state.currentTurnIdx,
+    selectedRoomId: state.selectedRoomId,
+    inventoryFilter: state.inventoryFilter,
+    mapZoom: state.mapZoom,
+    log: state.log,
+    rollDC: state.rollDC,
+    rollRows: state.rollRows
+  };
+}
+
+function applySavePayload(payload){
+  state.seed = payload.seed || null;
+  state.lastAutoSeed = payload.seed || null;
+  state.gameType = payload.gameType || "heist";
+  state.difficulty = payload.difficulty || "normal";
+  state.scenario = payload.scenario || null;
+  state.floors = payload.floors || (payload.map ? [payload.map] : []);
+  state.currentFloorIdx = Math.max(0, Math.min(payload.currentFloorIdx || 0, Math.max(0, state.floors.length - 1)));
+  state.map = state.floors[state.currentFloorIdx] || null;
+  state.players = payload.players || [];
+  state.enemies = payload.enemies || [];
+  state.loot = payload.loot || [];
+  state.customPools = payload.customPools || {};
+  state.turnOrder = payload.turnOrder || [];
+  state.currentTurnIdx = payload.currentTurnIdx ?? -1;
+  state.selectedRoomId = payload.selectedRoomId || null;
+  state.inventoryFilter = payload.inventoryFilter || "all";
+  state.mapZoom = payload.mapZoom || 1;
+  state.log = payload.log || [];
+  state.rollDC = payload.rollDC || 15;
+  state.rollRows = payload.rollRows || [];
+
+  state.players.forEach(p=>{
+    if(p.hp===undefined) p.hp=p.maxHp||20;
+    if(p.maxHp===undefined) p.maxHp=p.hp||20;
+    if(p.locationId===undefined) p.locationId=state.map?.rooms.find(r=>r.isStart)?.id||null;
+    if(!p.icon) p.icon="👤";
+    if(!p.color) p.color="#2dd4bf";
+    if(!Array.isArray(p.tags)) p.tags=[];
+  });
+  state.loot.forEach(normalizeLootItem);
+  if (state.seed){
+    document.getElementById("seedInput").value = state.seed;
+    document.getElementById("seedDisplay").textContent = state.seed;
+  }
+  document.querySelectorAll(".diffBtn").forEach(b=>b.classList.toggle("active", b.getAttribute("data-diff")===state.difficulty));
+}
+
+function autosaveNow(){
+  try{
+    if (!state.map && !state.scenario && !state.players.length && !state.enemies.length) return;
+    localStorage.setItem(OPSDECK_AUTOSAVE_KEY, JSON.stringify(buildSavePayload()));
+  }catch(err){
+    // Storage can be disabled/private; game still works without autosave.
+  }
+}
+
+function restoreAutosaveIfAvailable(){
+  try{
+    const raw = localStorage.getItem(OPSDECK_AUTOSAVE_KEY);
+    if (!raw) return;
+    const payload = JSON.parse(raw);
+    if (payload && (payload.map || (payload.floors && payload.floors.length) || payload.scenario)){
+      if (confirm("An OPS DECK autosave was found. Restore the previous session?")){
+        applySavePayload(payload);
+      }
+    }
+  }catch(err){
+    try{ localStorage.removeItem(OPSDECK_AUTOSAVE_KEY); }catch(e){}
+  }
+}
+
+setInterval(autosaveNow, 5000);
+window.addEventListener("beforeunload", autosaveNow);
+
 /* initial paint */
 populateClassSelect();
+restoreAutosaveIfAvailable();
 renderAll();
 
 })();
